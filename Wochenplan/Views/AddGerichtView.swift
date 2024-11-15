@@ -21,10 +21,6 @@ struct AddGerichtView: View {
         NavigationView {
             
             ZStack {
-                
-                Color(Color(red: 236 / 255, green: 244 / 255, blue: 214 / 255))
-                    .ignoresSafeArea()
-                
                 Form {
                     Section(header: Text("Gericht")) {
                         Picker("Wochentag", selection: $selectedWochentagIndex) {
@@ -74,13 +70,13 @@ struct AddGerichtView: View {
                         }) {
                             Text("Abbrechen")
                                 .padding()
-                                .foregroundColor(.orange)
+                                .foregroundColor(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
                                 .background(
                                     RoundedRectangle(
                                         cornerRadius: 20,
                                         style: .continuous
                                     )
-                                    .stroke(.orange, lineWidth: 2)
+                                    .stroke(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255), lineWidth: 2)
                                 )
                         }
                         .buttonStyle(BorderlessButtonStyle())
@@ -98,14 +94,14 @@ struct AddGerichtView: View {
                             Text("Speichern")
                                 .foregroundColor(.white)
                                 .padding()
-                                .background(Color.orange)
+                                .background(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
                                 .cornerRadius(20)
                         }
                         .disabled(gerichtName.isEmpty)
                     }
-                    .listRowBackground(Color(red: 236 / 255, green: 244 / 255, blue: 214 / 255))
                 }
                 .scrollContentBackground(.hidden)
+                
             }
             .navigationTitle("Gericht hinzufügen")
         }

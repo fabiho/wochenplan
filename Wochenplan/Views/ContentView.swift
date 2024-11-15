@@ -17,48 +17,58 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                
-                Color(Color(red: 236 / 255, green: 244 / 255, blue: 214 / 255))
-                    .ignoresSafeArea()
-                
-                List {
-                    ForEach(viewModel.wochentage) { tag in
-                        if !tag.gerichte.isEmpty {
-                            Section(header: Text(tag.name)) {
-                                ForEach(tag.gerichte) { gericht in
-                                    NavigationLink(destination: GerichtDetailView(gericht: gericht, wochentag: tag)) {
-                                        Text(gericht.name)
+                if viewModel.wochentage.allSatisfy({ $0.gerichte.isEmpty }) {
+                    VStack {
+                        Spacer()
+                        
+                        Image(systemName: "fork.knife")
+                            .font(.system(size: 50))
+                            .foregroundColor(Color.gray)
+                            .padding(.bottom, 20)
+                        
+                        Text("Erstelle jetzt über den Plus-Button dein erstes Gericht und plane deine Woche.")
+                            .font(.title3)
+                            .fontWeight(.medium)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.gray)
+                            .padding()
+                        
+                        Spacer()
+                    }
+                    .navigationTitle("Dein Wochenplan")
+                } else {
+                    List {
+                        ForEach(viewModel.wochentage) { tag in
+                            if !tag.gerichte.isEmpty {
+                                Section(header: Text(tag.name)) {
+                                    ForEach(tag.gerichte) { gericht in
+                                        NavigationLink(destination: GerichtDetailView(gericht: gericht, wochentag: tag)) {
+                                            Text(gericht.name)
+                                        }
+                                        .listRowBackground(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
+                                        .foregroundColor(Color.white)
                                     }
-                                    .listRowBackground(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
-                                    .foregroundColor(Color.white)
-                                }
-                                .onMove { indices, newOffset in
-                                    viewModel.moveGericht(within: tag, from: indices, to: newOffset)
-                                }
-                                .onDelete { indices in
-                                    viewModel.deleteGericht(at: indices, from: tag)
+                                    .onMove { indices, newOffset in
+                                        viewModel.moveGericht(within: tag, from: indices, to: newOffset)
+                                    }
+                                    .onDelete { indices in
+                                        viewModel.deleteGericht(at: indices, from: tag)
+                                    }
                                 }
                             }
                         }
                     }
+                    .navigationTitle("Dein Wochenplan")
+                    .scrollContentBackground(.hidden)
                 }
-                .navigationTitle("Dein Wochenplan")
-                .scrollContentBackground(.hidden)
                 
                 VStack {
                     Spacer()
                     HStack {
-                        CartButtonView {
-                            self.showEinkaufsliste = true
-                        }
-                        
-                        Spacer()
-                        
-                        PlusButtonView {
+                        ActionButtonView {
                             self.isShowingAddGericht = true
                         }
                     }
-                    .padding(.horizontal)
                 }
                 .sheet(isPresented: $isShowingAddGericht) {
                     AddGerichtView(viewModel: viewModel)
@@ -115,7 +125,7 @@ struct ContentView: View {
     // Setze das ViewModel mit den Beispielwochentagen
     let previewViewModel = WochenplanViewModel()
     previewViewModel.wochentage = exampleWochentage
-
+    
     return ContentView()
         .environmentObject(previewViewModel)
 }

@@ -14,10 +14,6 @@ struct GerichtDetailView: View {
     var body: some View {
         
         ZStack {
-            
-            Color(Color(red: 236 / 255, green: 244 / 255, blue: 214 / 255))
-                .ignoresSafeArea()
-            
             VStack(alignment: .leading, spacing: 10) {
                 
                 Text(gericht.name)
