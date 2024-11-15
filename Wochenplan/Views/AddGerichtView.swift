@@ -80,6 +80,7 @@ struct AddGerichtView: View {
                                 )
                         }
                         .buttonStyle(BorderlessButtonStyle())
+                        .shadow(radius: 5)
                         
                         Spacer()
                         
@@ -96,6 +97,7 @@ struct AddGerichtView: View {
                                 .padding()
                                 .background(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
                                 .cornerRadius(20)
+                                .shadow(radius: 5)
                         }
                         .disabled(gerichtName.isEmpty)
                     }

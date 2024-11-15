@@ -47,6 +47,7 @@ public struct ActionButtonView: View {
         }
         .frame(width: 180, height: 60)
         .clipShape(Capsule())
+        .shadow(radius: 5)
         
     }
 }
