@@ -20,18 +20,20 @@ struct GerichtDetailView: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
                 
-                Text("Wochentag: \(wochentag.name)")
-                    .font(.title3)
-                    .foregroundColor(.gray)
+                HStack{
+                    Image(systemName: "calendar")
+                    Text((wochentag.name))
+                        .font(.title3)
+                }
+                .foregroundStyle(Color.gray)
                 
                 List {
                     Section(header: Text("Zutaten")
                         .font(.headline)
-                        .foregroundColor(.primary)
                     ) {
                         ForEach(gericht.zutaten, id: \.self) { zutat in
                             Text(zutat)
-                                .listRowBackground(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
+                                .listRowBackground(Color.primary)
                                 .foregroundColor(Color.white)
                         }
                     }

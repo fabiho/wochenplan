@@ -24,7 +24,7 @@ public struct ActionButtonView: View {
                     .padding()
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .background(Color(Color(red: 38 / 255, green: 80 / 255, blue: 115 / 255)))
+                    .background(Color.secondary)
             }
             .buttonStyle(PlainButtonStyle())
             
@@ -41,7 +41,7 @@ public struct ActionButtonView: View {
                     .padding()
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .background(Color(Color(red: 38 / 255, green: 80 / 255, blue: 115 / 255)))
+                    .background(Color.secondary)
             }
             .buttonStyle(PlainButtonStyle())
         }

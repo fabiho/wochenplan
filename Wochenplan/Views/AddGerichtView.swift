@@ -23,20 +23,40 @@ struct AddGerichtView: View {
             ZStack {
                 Form {
                     Section(header: Text("Gericht")) {
-                        Picker("Wochentag", selection: $selectedWochentagIndex) {
-                            ForEach(0..<viewModel.wochentage.count, id: \.self) { index in
-                                Text(viewModel.wochentage[index].name)
-                                    .tag(index)
-                            }
-                            .foregroundColor(.white)
-                        }
-                        .foregroundColor(.white)
                         
                         TextField("Gerichtname", text: $gerichtName)
                             .foregroundColor(.white)
                             .focused($focusedField, equals: nil) // Setzt den Fokus auf das erste Textfeld
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 10) {
+                                ForEach(0..<viewModel.wochentage.count, id: \.self) { index in
+                                    Button(action: {
+                                        selectedWochentagIndex = index
+                                    }) {
+                                        Text(viewModel.wochentage[index].name)
+                                            .padding(10)
+                                            .background(selectedWochentagIndex == index ? (Color.secondary) : Color.secondary.opacity(0.4))
+                                            .foregroundColor(Color.white)
+                                            .cornerRadius(10)
+                                            .frame(height: 10)
+                                    }
+                                }
+                            }
+                            .padding(.vertical)
+                        }
+//                        Picker("Wochentag", selection: $selectedWochentagIndex) {
+//                            ForEach(0..<viewModel.wochentage.count, id: \.self) { index in
+//                                Text(viewModel.wochentage[index].name)
+//                                    .tag(index)
+//                            }
+//                            .foregroundColor(.white)
+//                        }
+//                        .foregroundColor(.white)
+//                        .pickerStyle(SegmentedPickerStyle())
+                        
                     }
-                    .listRowBackground(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
+                    .listRowBackground(Color.primary)
                     
                     Section(header: Text("Zutaten")) {
                         ForEach(zutaten.indices, id: \.self) { index in
@@ -61,7 +81,7 @@ struct AddGerichtView: View {
                             }
                         }
                     }
-                    .listRowBackground(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
+                    .listRowBackground(Color.primary)
                     
                     HStack {
                         // Abbrechen-Button
@@ -70,13 +90,13 @@ struct AddGerichtView: View {
                         }) {
                             Text("Abbrechen")
                                 .padding()
-                                .foregroundColor(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
+                                .foregroundColor(Color.primary)
                                 .background(
                                     RoundedRectangle(
                                         cornerRadius: 20,
                                         style: .continuous
                                     )
-                                    .stroke(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255), lineWidth: 2)
+                                    .stroke(Color.primary, lineWidth: 2)
                                 )
                         }
                         .buttonStyle(BorderlessButtonStyle())
@@ -95,7 +115,7 @@ struct AddGerichtView: View {
                             Text("Speichern")
                                 .foregroundColor(.white)
                                 .padding()
-                                .background(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
+                                .background(Color.primary)
                                 .cornerRadius(20)
                                 .shadow(radius: 5)
                         }
@@ -109,6 +129,3 @@ struct AddGerichtView: View {
         }
     }
 }
-
-
-

@@ -43,9 +43,10 @@ struct ContentView: View {
                                 Section(header: Text(tag.name)) {
                                     ForEach(tag.gerichte) { gericht in
                                         NavigationLink(destination: GerichtDetailView(gericht: gericht, wochentag: tag)) {
+                                            Image(systemName: "fork.knife")
                                             Text(gericht.name)
                                         }
-                                        .listRowBackground(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
+                                        .listRowBackground(Color.primary)
                                         .foregroundColor(Color.white)
                                     }
                                     .onMove { indices, newOffset in

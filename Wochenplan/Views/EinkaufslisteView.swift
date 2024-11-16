@@ -45,7 +45,7 @@ struct EinkaufslisteView: View {
                         ProgressView(value: progress, total: 1)
                             .progressViewStyle(LinearProgressViewStyle())
                             .padding()
-                            .accentColor(Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255))
+                            .accentColor(Color.secondary)
                         
                         List {
                             ForEach(viewModel.alleZutaten.sorted(), id: \.self) { zutat in
@@ -56,12 +56,17 @@ struct EinkaufslisteView: View {
                                         checkedItems[zutat] = !isChecked
                                     }) {
                                         Image(systemName: isChecked ? "checkmark.square" : "square")
-                                            .foregroundColor(isChecked ? Color(red: 45 / 255, green: 149 / 255, blue: 150 / 255) : .gray)
+                                            .foregroundColor(isChecked ? Color.primary : .gray)
                                     }
                                     
                                     Text(zutat)
                                         .strikethrough(isChecked, color: .gray)
                                         .foregroundColor(isChecked ? .gray : .white)
+                                    Spacer()
+                                    Image("bread") // Icon der Kategorie
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(height: 30)
                                 }
                                 .onAppear {
                                     if checkedItems[zutat] == nil {
@@ -69,10 +74,11 @@ struct EinkaufslisteView: View {
                                     }
                                 }
                             }
-                            .listRowBackground(Color(red: 38 / 255, green: 80 / 255, blue: 115 / 255))
+                            .listRowBackground(Color.secondary)
                         }
                     }
                     .navigationTitle("Einkaufsliste")
+                    .scrollContentBackground(.hidden)
                 }
             }
         }
