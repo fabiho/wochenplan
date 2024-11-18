@@ -48,11 +48,19 @@ class WochenplanViewModel: ObservableObject {
             wochentage[tagIndex].gerichte.remove(atOffsets: indices)
         }
     }
+
+//    TODO
+//    func deleteZutat(from gericht: Gericht, in tag: Wochentag, zutat: String) {
+//        if let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }),
+//           let gerichtIndex = wochentage[tagIndex].gerichte.firstIndex(where: { $0.id == gericht.id }) {
+//            wochentage[tagIndex].gerichte[gerichtIndex].zutaten.removeAll { $0 == zutat }
+//        }
+//    }
     
     var alleZutaten: [String] {
         let ingredients = wochentage.flatMap { $0.gerichte.flatMap { $0.zutaten } }
         return Array(Set(ingredients)) // Duplikate entfernen
     }
-
+    
     
 }

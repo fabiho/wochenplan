@@ -45,39 +45,38 @@ struct AddGerichtView: View {
                             }
                             .padding(.vertical)
                         }
-//                        Picker("Wochentag", selection: $selectedWochentagIndex) {
-//                            ForEach(0..<viewModel.wochentage.count, id: \.self) { index in
-//                                Text(viewModel.wochentage[index].name)
-//                                    .tag(index)
-//                            }
-//                            .foregroundColor(.white)
-//                        }
-//                        .foregroundColor(.white)
-//                        .pickerStyle(SegmentedPickerStyle())
-                        
                     }
                     .listRowBackground(Color.primary)
                     
                     Section(header: Text("Zutaten")) {
                         ForEach(zutaten.indices, id: \.self) { index in
-                            TextField("Zutat \(index + 1)", text: $zutaten[index])
-                                .foregroundColor(.white)
-                                .focused($focusedField, equals: index) // Setzt den Fokus auf Textfeld
-                                .onSubmit {
-                                    // Wenn Enter gedrückt nächsten Textfeld
-                                    if index < zutaten.count - 1 {
-                                        focusedField = index + 1
-                                    } else if index == zutaten.count - 1 && !zutaten[index].isEmpty {
-                                        // Füge ein neues Feld hinzu, wenn das letzte ausgefüllt ist
+                            TextField("Zutat \(index + 1)", text: Binding(
+                                get: { zutaten[index] },
+                                set: { newValue in
+                                    zutaten[index] = newValue
+                                    // Automatisches Hinzufügen einer neuen Zeile
+                                    if index == zutaten.count - 1 && !newValue.isEmpty {
                                         zutaten.append("")
-                                        focusedField = zutaten.count - 1
                                     }
                                 }
+                            ))
+                            .foregroundColor(.white)
+                            .focused($focusedField, equals: index)
+                            .onSubmit {
+                                // Wechsel zum nächsten Feld
+                                if index < zutaten.count - 1 {
+                                    focusedField = index + 1
+                                } else if index == zutaten.count - 1 && !zutaten[index].isEmpty {
+                                    // Füge eine neue Zeile hinzu, wenn die aktuelle die letzte ist
+                                    zutaten.append("")
+                                    focusedField = zutaten.count - 1
+                                }
+                            }
                         }
                         .onDelete { indexSet in
                             zutaten.remove(atOffsets: indexSet)
                             if zutaten.isEmpty {
-                                zutaten.append("")  // Stelle sicher, dass mindestens ein leeres Feld bleibt
+                                zutaten.append("")  // Es bleibt mindest ein Feld vorhanden
                             }
                         }
                     }

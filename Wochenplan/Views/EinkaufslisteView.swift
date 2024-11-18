@@ -45,7 +45,7 @@ struct EinkaufslisteView: View {
                         ProgressView(value: progress, total: 1)
                             .progressViewStyle(LinearProgressViewStyle())
                             .padding()
-                            .accentColor(Color.secondary)
+                            .accentColor(Color.primary)
                         
                         List {
                             ForEach(viewModel.alleZutaten.sorted(), id: \.self) { zutat in

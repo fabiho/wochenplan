@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct GerichtDetailView: View {
+//    @ObservedObject var viewModel: WochenplanViewModel
     var gericht: Gericht
     var wochentag: Wochentag
     
@@ -32,23 +33,33 @@ struct GerichtDetailView: View {
                         .font(.headline)
                     ) {
                         ForEach(gericht.zutaten, id: \.self) { zutat in
-                            Text(zutat)
-                                .listRowBackground(Color.primary)
-                                .foregroundColor(Color.white)
+                            HStack {
+                                Text(zutat)
+                                Spacer()
+                                Image("bread") // Icon der Kategorie
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(height: 30)
+                            }
+                            .listRowBackground(Color.primary)
+                            .foregroundColor(Color.white)
                         }
+//                        TODO
+//                        .onDelete { indexSet in
+//                            if let index = indexSet.first {
+//                                let zutatToDelete = gericht.zutaten[index]
+//                                viewModel.deleteZutat(from: gericht, in: wochentag, zutat: zutatToDelete)
+//                            }
+//                        }
                     }
                 }
                 .scrollContentBackground(.hidden)
-                
             }
             .padding()
             .navigationTitle("Gerichtdetails")
             .navigationBarTitleDisplayMode(.inline)
         }
-        
     }
-    
-    
 }
 
 
