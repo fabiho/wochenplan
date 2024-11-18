@@ -25,8 +25,12 @@ struct AddGerichtView: View {
                     Section(header: Text("Gericht")) {
                         TextField("Gerichtname", text: $gerichtName)
                             .foregroundColor(.white)
-                            .focused($focusedField, equals: nil)
-                        
+                            .focused($focusedField, equals: -1)
+                            .onSubmit {
+                                if gerichtName.isEmpty == false {
+                                    focusedField = 0
+                                }
+                            }
                         WochentagSelectorView(wochentage: viewModel.wochentage, selectedIndex: $selectedWochentagIndex)
                     }
                     .listRowBackground(Color.primary)
