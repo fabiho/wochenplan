@@ -7,55 +7,110 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 class WochenplanViewModel: ObservableObject {
     @Published var wochentage: [Wochentag] = []
+    @Published var gerichte: [Gericht] = []
+    private var modelContext: ModelContext?
     
-    init() {
+    private let wochentagReihenfolge: [String] = [
+        "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"
+    ]
+       
+    // Standard-Initialisierer
+     init(context: ModelContext?) {
+         self.modelContext = context
+         loadWochentage()
+     }
+     
+     // Initialisierer für Preview oder Test
+     convenience init(previewData: [Wochentag] = []) {
+         self.init(context: nil)
+         self.wochentage = previewData
+     }
+     
+    func loadWochentage() {
+        guard let modelContext = modelContext else {
+            // Keine Datenbank: Beispielwochentage für Preview
+            let tage = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
+            self.wochentage = tage.map { Wochentag(name: $0, gerichte: []) }
+            return
+        }
+        
+        // Daten aus der Datenbank laden
+        let request = FetchDescriptor<Wochentag>()
+        if let fetchedWochentage = try? modelContext.fetch(request) {
+            if fetchedWochentage.isEmpty {
+                addDefaultWochentage()
+            } else {
+                self.wochentage = fetchedWochentage
+                sortWochentage()
+            }
+        }
+    }
+    
+    func addDefaultWochentage() {
         let tage = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
-        wochentage = tage.map { Wochentag(name: $0, gerichte: []) }
+        let defaultWochentage = tage.map { Wochentag(name: $0, gerichte: []) }
+        for tag in defaultWochentage {
+            modelContext?.insert(tag)
+        }
+        try? modelContext?.save()
+        self.wochentage = defaultWochentage
+        sortWochentage()
+    }
+    
+    func sortWochentage() {
+        self.wochentage.sort {
+            guard let index1 = wochentagReihenfolge.firstIndex(of: $0.name),
+                  let index2 = wochentagReihenfolge.firstIndex(of: $1.name) else {
+                return false
+            }
+            return index1 < index2
+        }
     }
     
     func addGericht(to tag: Wochentag, gericht: Gericht) {
         if let index = wochentage.firstIndex(where: { $0.id == tag.id }) {
-            var updatedTag = wochentage[index]
-            updatedTag.gerichte.append(gericht)
-            wochentage[index] = updatedTag // Zuweisung, um die Veränderung korrekt zu propagieren
-            print("Gericht \(gericht.name) hinzugefügt zu \(updatedTag.name)")
+            wochentage[index].gerichte.append(gericht)
+            save(tag: wochentage[index])
         }
     }
     
-    // Funktion zum Verschieben eines Gerichts innerhalb eines Tages
     func moveGericht(within tag: Wochentag, from indices: IndexSet, to newOffset: Int) {
-        guard let sourceIndex = indices.first else { return }
+        guard let sourceIndex = indices.first,
+              let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }) else { return }
         
-        // Finde den Index des Tags
-        guard let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }) else { return }
-        
-        // Hole das Gericht, das verschoben werden soll
-        let gericht = wochentage[tagIndex].gerichte[sourceIndex]
-        
-        // Entferne das Gericht aus dem aktuellen Index
-        wochentage[tagIndex].gerichte.remove(at: sourceIndex)
-        
-        // Berechne den neuen Offset korrekt und füge das Gericht an der neuen Position hinzu
+        let gericht = wochentage[tagIndex].gerichte.remove(at: sourceIndex)
         let targetIndex = newOffset > sourceIndex ? newOffset - 1 : newOffset
         wochentage[tagIndex].gerichte.insert(gericht, at: targetIndex)
+        save(tag: wochentage[tagIndex])
     }
     
     func deleteGericht(at indices: IndexSet, from tag: Wochentag) {
         if let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }) {
+            for index in indices {
+                let gericht = wochentage[tagIndex].gerichte[index]
+                modelContext?.delete(gericht)
+            }
             wochentage[tagIndex].gerichte.remove(atOffsets: indices)
+            save(tag: wochentage[tagIndex])
         }
     }
 
-//    TODO
-//    func deleteZutat(from gericht: Gericht, in tag: Wochentag, zutat: String) {
-//        if let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }),
-//           let gerichtIndex = wochentage[tagIndex].gerichte.firstIndex(where: { $0.id == gericht.id }) {
-//            wochentage[tagIndex].gerichte[gerichtIndex].zutaten.removeAll { $0 == zutat }
-//        }
-//    }
+    func deleteZutat(from gericht: Gericht, in tag: Wochentag, zutat: String) {
+        if let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }),
+           let gerichtIndex = wochentage[tagIndex].gerichte.firstIndex(where: { $0.id == gericht.id }) {
+            wochentage[tagIndex].gerichte[gerichtIndex].zutaten.removeAll { $0 == zutat }
+            save(tag: wochentage[tagIndex])
+        }
+    }
+    
+    private func save(tag: Wochentag) {
+        modelContext?.insert(tag)
+        try? modelContext?.save()
+    }
     
     var alleZutaten: [String] {
         let ingredients = wochentage.flatMap { $0.gerichte.flatMap { $0.zutaten } }

@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct WochentagSelectorView: View {
-    let wochentage: [Wochentag]
+    var wochentage: [Wochentag]
     @Binding var selectedIndex: Int
 
     var body: some View {

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
     @EnvironmentObject var viewModel: WochenplanViewModel
@@ -124,17 +125,30 @@ struct ContentView: View {
     ]
     
     // Setze das ViewModel mit den Beispielwochentagen
-    let previewViewModel = WochenplanViewModel()
-    previewViewModel.wochentage = exampleWochentage
+    let previewViewModel = WochenplanViewModel(previewData: exampleWochentage)
     
-    return ContentView()
+    ContentView()
         .environmentObject(previewViewModel)
 }
 
 
 #Preview("Ohne Inhalt") {
-    ContentView()
-        .environmentObject(WochenplanViewModel())
+    // Beispielgerichte und Wochentage für die leere Vorschau
+        let exampleGerichte: [Gericht] = []
+        let exampleWochentage: [Wochentag] = [
+            Wochentag(name: "Montag", gerichte: exampleGerichte),
+            Wochentag(name: "Dienstag", gerichte: exampleGerichte),
+            Wochentag(name: "Mittwoch", gerichte: exampleGerichte),
+            Wochentag(name: "Donnerstag", gerichte: exampleGerichte),
+            Wochentag(name: "Freitag", gerichte: exampleGerichte),
+            Wochentag(name: "Samstag", gerichte: exampleGerichte),
+            Wochentag(name: "Sonntag", gerichte: exampleGerichte)
+        ]
+        
+        let previewViewModel = WochenplanViewModel(previewData: exampleWochentage)
+        
+        ContentView()
+            .environmentObject(previewViewModel)
 }
 
 

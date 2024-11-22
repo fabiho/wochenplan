@@ -6,15 +6,25 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct WochenplanApp: App {
-    @StateObject var viewModel = WochenplanViewModel()
+    var modelContainer: ModelContainer = {
+        do {
+            return try ModelContainer(for: Gericht.self, Wochentag.self)
+        } catch {
+            fatalError("Fehler beim Initialisieren des ModelContainers: \(error)")
+        }
+    }()
     
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(viewModel)
+                .environmentObject(WochenplanViewModel(context: modelContainer.mainContext))
+                .modelContainer(modelContainer)
         }
     }
 }
+
+

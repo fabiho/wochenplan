@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct GerichtDetailView: View {
-//    @ObservedObject var viewModel: WochenplanViewModel
+    @EnvironmentObject var viewModel: WochenplanViewModel
     var gericht: Gericht
     var wochentag: Wochentag
     
@@ -44,13 +44,12 @@ struct GerichtDetailView: View {
                             .listRowBackground(Color.primary)
                             .foregroundColor(Color.white)
                         }
-//                        TODO
-//                        .onDelete { indexSet in
-//                            if let index = indexSet.first {
-//                                let zutatToDelete = gericht.zutaten[index]
-//                                viewModel.deleteZutat(from: gericht, in: wochentag, zutat: zutatToDelete)
-//                            }
-//                        }
+                        .onDelete { indexSet in
+                            if let index = indexSet.first {
+                                let zutatToDelete = gericht.zutaten[index]
+                                viewModel.deleteZutat(from: gericht, in: wochentag, zutat: zutatToDelete)
+                            }
+                        }
                     }
                 }
                 .scrollContentBackground(.hidden)
