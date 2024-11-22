@@ -25,10 +25,9 @@ struct ContentView: View {
                         Image(systemName: "fork.knife")
                             .font(.system(size: 50))
                             .foregroundColor(Color.gray)
-                            .padding(.bottom, 20)
                         
                         Text("Erstelle jetzt über den Plus-Button dein erstes Gericht und plane deine Woche.")
-                            .font(.title3)
+                            .font(.body)
                             .fontWeight(.medium)
                             .multilineTextAlignment(.center)
                             .foregroundColor(.gray)
@@ -74,6 +73,21 @@ struct ContentView: View {
                 }
                 .sheet(isPresented: $isShowingAddGericht) {
                     AddGerichtView(viewModel: viewModel)
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        Button(action: {
+                            viewModel.deleteAllGerichte()
+                        }) {
+                            Label("Alle Gerichte löschen", systemImage: "trash.fill")
+                                .foregroundColor(.red)
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
         }
@@ -134,21 +148,21 @@ struct ContentView: View {
 
 #Preview("Ohne Inhalt") {
     // Beispielgerichte und Wochentage für die leere Vorschau
-        let exampleGerichte: [Gericht] = []
-        let exampleWochentage: [Wochentag] = [
-            Wochentag(name: "Montag", gerichte: exampleGerichte),
-            Wochentag(name: "Dienstag", gerichte: exampleGerichte),
-            Wochentag(name: "Mittwoch", gerichte: exampleGerichte),
-            Wochentag(name: "Donnerstag", gerichte: exampleGerichte),
-            Wochentag(name: "Freitag", gerichte: exampleGerichte),
-            Wochentag(name: "Samstag", gerichte: exampleGerichte),
-            Wochentag(name: "Sonntag", gerichte: exampleGerichte)
-        ]
-        
-        let previewViewModel = WochenplanViewModel(previewData: exampleWochentage)
-        
-        ContentView()
-            .environmentObject(previewViewModel)
+    let exampleGerichte: [Gericht] = []
+    let exampleWochentage: [Wochentag] = [
+        Wochentag(name: "Montag", gerichte: exampleGerichte),
+        Wochentag(name: "Dienstag", gerichte: exampleGerichte),
+        Wochentag(name: "Mittwoch", gerichte: exampleGerichte),
+        Wochentag(name: "Donnerstag", gerichte: exampleGerichte),
+        Wochentag(name: "Freitag", gerichte: exampleGerichte),
+        Wochentag(name: "Samstag", gerichte: exampleGerichte),
+        Wochentag(name: "Sonntag", gerichte: exampleGerichte)
+    ]
+    
+    let previewViewModel = WochenplanViewModel(previewData: exampleWochentage)
+    
+    ContentView()
+        .environmentObject(previewViewModel)
 }
 
 

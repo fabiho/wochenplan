@@ -28,10 +28,9 @@ struct EinkaufslisteView: View {
                         Image(systemName: "cart.fill")
                             .font(.system(size: 50))
                             .foregroundColor(Color.gray)
-                            .padding(.bottom, 20)
                         
                         Text("Deine Einkaufsliste ist leer. Plane zuerst deine Woche.")
-                            .font(.title3)
+                            .font(.body)
                             .fontWeight(.medium)
                             .multilineTextAlignment(.center)
                             .foregroundColor(.gray)
@@ -79,6 +78,21 @@ struct EinkaufslisteView: View {
                     }
                     .navigationTitle("Einkaufsliste")
                     .scrollContentBackground(.hidden)
+                }
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button(action: {
+//                        viewModel.deleteAllGerichte()
+                    }) {
+                        Label("Alles erledigt", systemImage: "checkmark.square")
+                            .foregroundColor(.red)
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .foregroundColor(.secondary)
                 }
             }
         }

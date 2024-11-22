@@ -17,19 +17,19 @@ class WochenplanViewModel: ObservableObject {
     private let wochentagReihenfolge: [String] = [
         "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"
     ]
-       
+    
     // Standard-Initialisierer
-     init(context: ModelContext?) {
-         self.modelContext = context
-         loadWochentage()
-     }
-     
-     // Initialisierer für Preview oder Test
-     convenience init(previewData: [Wochentag] = []) {
-         self.init(context: nil)
-         self.wochentage = previewData
-     }
-     
+    init(context: ModelContext?) {
+        self.modelContext = context
+        loadWochentage()
+    }
+    
+    // Initialisierer für Preview oder Test
+    convenience init(previewData: [Wochentag] = []) {
+        self.init(context: nil)
+        self.wochentage = previewData
+    }
+    
     func loadWochentage() {
         guard let modelContext = modelContext else {
             // Keine Datenbank: Beispielwochentage für Preview
@@ -98,7 +98,17 @@ class WochenplanViewModel: ObservableObject {
             save(tag: wochentage[tagIndex])
         }
     }
-
+    
+    func deleteAllGerichte() {
+        for wochentag in wochentage {
+            for gericht in wochentag.gerichte {
+                modelContext?.delete(gericht)
+            }
+            wochentag.gerichte.removeAll()
+        }
+        try? modelContext?.save()
+    }
+    
     func deleteZutat(from gericht: Gericht, in tag: Wochentag, zutat: String) {
         if let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }),
            let gerichtIndex = wochentage[tagIndex].gerichte.firstIndex(where: { $0.id == gericht.id }) {
@@ -106,6 +116,8 @@ class WochenplanViewModel: ObservableObject {
             save(tag: wochentage[tagIndex])
         }
     }
+    
+    
     
     private func save(tag: Wochentag) {
         modelContext?.insert(tag)

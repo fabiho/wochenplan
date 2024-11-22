@@ -20,7 +20,7 @@ public struct ActionButtonView: View {
             // Linke Seite (Cart)
             NavigationLink(destination: EinkaufslisteView(viewModel: viewModel)) {
                 Image(systemName: "cart.fill")
-                    .font(.largeTitle)
+                    .font(.title)
                     .padding()
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -37,7 +37,7 @@ public struct ActionButtonView: View {
                 action()
             }) {
                 Image(systemName: "plus.circle.fill")
-                    .font(.largeTitle)
+                    .font(.title)
                     .padding()
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
@@ -45,7 +45,7 @@ public struct ActionButtonView: View {
             }
             .buttonStyle(PlainButtonStyle())
         }
-        .frame(width: 180, height: 60)
+        .frame(width: 180, height: 50)
         .clipShape(Capsule())
         .shadow(radius: 5)
         
