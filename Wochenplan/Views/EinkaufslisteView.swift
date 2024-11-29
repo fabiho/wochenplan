@@ -10,7 +10,7 @@ import SwiftUI
 
 struct EinkaufslisteView: View {
     @ObservedObject var viewModel: WochenplanViewModel
-    @State private var checkedItems: [String: Bool] = [:]
+    @State private var checkedItems: [UUID: Bool] = [:]
     
     var progress: Double {
         let totalItems = viewModel.alleZutaten.count
@@ -22,23 +22,7 @@ struct EinkaufslisteView: View {
         NavigationView {
             ZStack {
                 if viewModel.alleZutaten.isEmpty {
-                    VStack {
-                        Spacer()
-                        
-                        Image(systemName: "cart.fill")
-                            .font(.system(size: 50))
-                            .foregroundColor(Color.gray)
-                        
-                        Text("Deine Einkaufsliste ist leer. Plane zuerst deine Woche.")
-                            .font(.body)
-                            .fontWeight(.medium)
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.gray)
-                            .padding()
-                        
-                        Spacer()
-                    }
-                    .navigationTitle("Einkaufsliste")
+                    EmptyEinkaufslisteView()
                 } else {
                     VStack(spacing: -15) {
                         ProgressView(value: progress, total: 1)
@@ -46,33 +30,15 @@ struct EinkaufslisteView: View {
                             .padding()
                             .accentColor(Color.primary)
                         
-                        List {
-                            ForEach(viewModel.alleZutaten.sorted(), id: \.self) { zutat in
-                                HStack {
-                                    let isChecked = checkedItems[zutat] ?? false
-                                    
-                                    Button(action: {
-                                        checkedItems[zutat] = !isChecked
-                                    }) {
-                                        Image(systemName: isChecked ? "checkmark.square" : "square")
-                                            .foregroundColor(isChecked ? Color.primary : .gray)
-                                    }
-                                    
-                                    Text(zutat)
-                                        .strikethrough(isChecked, color: .gray)
-                                        .foregroundColor(isChecked ? .gray : .white)
-                                    Spacer()
-                                    Image("bread") // Icon der Kategorie
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(height: 30)
+                        List(viewModel.alleZutaten, id: \.id) { zutat in
+                            EinkaufslisteRow(
+                                zutat: zutat,
+                                isChecked: checkedItems[zutat.id] ?? false,
+                                toggleAction: {
+                                    checkedItems[zutat.id] = !(checkedItems[zutat.id] ?? false)
+                                    viewModel.toggleZutatErledigt(zutat: zutat)
                                 }
-                                .onAppear {
-                                    if checkedItems[zutat] == nil {
-                                        checkedItems[zutat] = false
-                                    }
-                                }
-                            }
+                            )
                             .listRowBackground(Color.secondary)
                         }
                     }
@@ -84,9 +50,11 @@ struct EinkaufslisteView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
-                    Button(action: {
-//                        viewModel.deleteAllGerichte()
-                    }) {
+                    Button() {
+                        viewModel.markiereAllesErledigt()
+                        checkedItems = Dictionary(uniqueKeysWithValues: viewModel.alleZutaten.map { ($0.id, true) })
+                    }
+                    label: {
                         Label("Alles erledigt", systemImage: "checkmark.square")
                             .foregroundColor(.red)
                     }
@@ -98,6 +66,8 @@ struct EinkaufslisteView: View {
         }
     }
 }
+
+
 
 
 

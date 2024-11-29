@@ -49,7 +49,9 @@ struct AddGerichtView: View {
                         
                         SaveButtonView(
                             action: {
-                                let neueZutaten = zutaten.filter {!$0.isEmpty}
+                                let neueZutaten = zutaten
+                                    .filter { !$0.isEmpty }
+                                    .map { Zutat(name: $0, erledigt: false)}
                                 let neuesGericht = Gericht(name: gerichtName, zutaten: neueZutaten)
                                 let selectedTag = viewModel.wochentage[selectedWochentagIndex]
                                 viewModel.addGericht(to: selectedTag, gericht: neuesGericht)

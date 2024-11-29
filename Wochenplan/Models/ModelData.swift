@@ -9,12 +9,25 @@ import Foundation
 import SwiftData
 
 @Model
+class Zutat {
+    @Attribute(.unique) var id: UUID
+    var name: String
+    var erledigt: Bool
+    
+    init(name: String, erledigt: Bool = false) {
+        self.id = UUID()
+        self.name = name
+        self.erledigt = erledigt
+    }
+}
+
+@Model
 class Gericht {
     @Attribute(.unique) var id: UUID
     var name: String
-    var zutaten: [String]
+    var zutaten: [Zutat]
 
-    init(name: String, zutaten: [String]) {
+    init(name: String, zutaten: [Zutat]) {
         self.id = UUID()
         self.name = name
         self.zutaten = zutaten

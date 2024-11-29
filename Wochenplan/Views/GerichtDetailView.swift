@@ -34,7 +34,7 @@ struct GerichtDetailView: View {
                     ) {
                         ForEach(gericht.zutaten, id: \.self) { zutat in
                             HStack {
-                                Text(zutat)
+                                Text(zutat.name)
                                 Spacer()
                                 Image("bread") // Icon der Kategorie
                                     .resizable()

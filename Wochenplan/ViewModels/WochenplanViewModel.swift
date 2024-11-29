@@ -18,6 +18,11 @@ class WochenplanViewModel: ObservableObject {
         "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"
     ]
     
+    var alleZutaten: [Zutat] {
+        return wochentage
+            .flatMap { $0.gerichte.flatMap { $0.zutaten } }
+    }
+    
     // Standard-Initialisierer
     init(context: ModelContext?) {
         self.modelContext = context
@@ -74,7 +79,7 @@ class WochenplanViewModel: ObservableObject {
     func addGericht(to tag: Wochentag, gericht: Gericht) {
         if let index = wochentage.firstIndex(where: { $0.id == tag.id }) {
             wochentage[index].gerichte.append(gericht)
-            save(tag: wochentage[index])
+            saveTag(tag: wochentage[index])
         }
     }
     
@@ -85,7 +90,7 @@ class WochenplanViewModel: ObservableObject {
         let gericht = wochentage[tagIndex].gerichte.remove(at: sourceIndex)
         let targetIndex = newOffset > sourceIndex ? newOffset - 1 : newOffset
         wochentage[tagIndex].gerichte.insert(gericht, at: targetIndex)
-        save(tag: wochentage[tagIndex])
+        saveTag(tag: wochentage[tagIndex])
     }
     
     func deleteGericht(at indices: IndexSet, from tag: Wochentag) {
@@ -95,8 +100,42 @@ class WochenplanViewModel: ObservableObject {
                 modelContext?.delete(gericht)
             }
             wochentage[tagIndex].gerichte.remove(atOffsets: indices)
-            save(tag: wochentage[tagIndex])
+            saveTag(tag: wochentage[tagIndex])
         }
+    }
+    
+    func toggleZutatErledigt(zutat: Zutat) {
+        // Suche den entsprechenden Wochentag
+        if let tagIndex = wochentage.firstIndex(where: {
+            $0.gerichte.contains(where: {
+                $0.zutaten.contains(where: { $0.id == zutat.id })
+            })
+        }) {
+            // Suche das Gericht innerhalb des Wochentages
+            for (gerichtIndex, gericht) in wochentage[tagIndex].gerichte.enumerated() {
+                if let zutatIndex = gericht.zutaten.firstIndex(where: { $0.id == zutat.id }) {
+                    // Ändere den Status der gefundenen Zutat
+                    wochentage[tagIndex].gerichte[gerichtIndex].zutaten[zutatIndex].erledigt.toggle()
+                    
+                    // Speichere die Änderungen im ModelContext
+                    saveTag(tag: wochentage[tagIndex])
+                    break
+                }
+            }
+        }
+    }
+
+    
+    // Funktion, um alle Zutaten als erledigt zu markieren
+    func markiereAllesErledigt() {
+        for tagIndex in 0..<wochentage.count {
+            for gerichtIndex in 0..<wochentage[tagIndex].gerichte.count {
+                for zutatIndex in 0..<wochentage[tagIndex].gerichte[gerichtIndex].zutaten.count {
+                    wochentage[tagIndex].gerichte[gerichtIndex].zutaten[zutatIndex].erledigt = true
+                }
+            }
+        }
+        try? modelContext?.save()
     }
     
     func deleteAllGerichte() {
@@ -109,25 +148,30 @@ class WochenplanViewModel: ObservableObject {
         try? modelContext?.save()
     }
     
-    func deleteZutat(from gericht: Gericht, in tag: Wochentag, zutat: String) {
+    func deleteZutat(from gericht: Gericht, in tag: Wochentag, zutat: Zutat) {
         if let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }),
            let gerichtIndex = wochentage[tagIndex].gerichte.firstIndex(where: { $0.id == gericht.id }) {
             wochentage[tagIndex].gerichte[gerichtIndex].zutaten.removeAll { $0 == zutat }
-            save(tag: wochentage[tagIndex])
+            saveTag(tag: wochentage[tagIndex])
         }
     }
     
+    func toggleZutatErledigt(zutat: Zutat, in gericht: Gericht) {
+        if let gerichtIndex = gerichte.firstIndex(where: { $0.id == gericht.id }) {
+            if let zutatIndex = gerichte[gerichtIndex].zutaten.firstIndex(where: { $0.id == zutat.id }) {
+                gerichte[gerichtIndex].zutaten[zutatIndex].erledigt.toggle()
+                saveGericht(gericht: gerichte[gerichtIndex])
+            }
+        }
+    }
     
-    
-    private func save(tag: Wochentag) {
+    private func saveTag(tag: Wochentag) {
         modelContext?.insert(tag)
         try? modelContext?.save()
     }
     
-    var alleZutaten: [String] {
-        let ingredients = wochentage.flatMap { $0.gerichte.flatMap { $0.zutaten } }
-        return Array(Set(ingredients)) // Duplikate entfernen
+    private func saveGericht(gericht: Gericht) {
+        modelContext?.insert(gericht)
+        try? modelContext?.save()
     }
-    
-    
 }
