@@ -21,7 +21,7 @@ struct EinkaufslisteRow: View {
             }
 
             Text(zutat.name)
-                .strikethrough(isChecked, color: .gray)  // Verwende 'isChecked'
+                .strikethrough(isChecked, color: .gray)
                 .foregroundColor(isChecked ? .gray : .white)
 
             Spacer()
@@ -33,5 +33,7 @@ struct EinkaufslisteRow: View {
         }
     }
 }
+
+
 
 

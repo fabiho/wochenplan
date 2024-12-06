@@ -12,10 +12,29 @@ import SwiftData
 class WochenplanViewModel: ObservableObject {
     @Published var wochentage: [Wochentag] = []
     @Published var gerichte: [Gericht] = []
+    @Published var kategorien: [Kategorie] = []
     private var modelContext: ModelContext?
     
-    private let wochentagReihenfolge: [String] = [
+    let standardWochentage = [
+        Wochentag(name: "Montag", gerichte: []),
+        Wochentag(name: "Dienstag", gerichte: []),
+        Wochentag(name: "Mittwoch", gerichte: []),
+        Wochentag(name: "Donnerstag", gerichte: []),
+        Wochentag(name: "Freitag", gerichte: []),
+        Wochentag(name: "Samstag", gerichte: []),
+        Wochentag(name: "Sonntag", gerichte: [])
+    ]
+    
+    let wochentagReihenfolge: [String] = [
         "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"
+    ]
+    
+    let standardKategorien = [
+        Kategorie(name: "Obst & Gemüse"),
+        Kategorie(name: "Kühltheke"),
+        Kategorie(name: "Dosen"),
+        Kategorie(name: "Brot & Backwaren"),
+        Kategorie(name: "Getränke")
     ]
     
     var alleZutaten: [Zutat] {
@@ -27,6 +46,10 @@ class WochenplanViewModel: ObservableObject {
     init(context: ModelContext?) {
         self.modelContext = context
         loadWochentage()
+        if kategorien.isEmpty {
+            loadKategorien()
+        }
+        
     }
     
     // Initialisierer für Preview oder Test
@@ -37,13 +60,10 @@ class WochenplanViewModel: ObservableObject {
     
     func loadWochentage() {
         guard let modelContext = modelContext else {
-            // Keine Datenbank: Beispielwochentage für Preview
-            let tage = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
-            self.wochentage = tage.map { Wochentag(name: $0, gerichte: []) }
+            print("ModelContext ist nicht verfügbar.")
             return
         }
         
-        // Daten aus der Datenbank laden
         let request = FetchDescriptor<Wochentag>()
         if let fetchedWochentage = try? modelContext.fetch(request) {
             if fetchedWochentage.isEmpty {
@@ -55,15 +75,48 @@ class WochenplanViewModel: ObservableObject {
         }
     }
     
+    func loadKategorien() {
+        guard let modelContext = modelContext else {
+            print("ModelContext ist nicht verfügbar.")
+            return
+        }
+        
+        let request = FetchDescriptor<Kategorie>()
+        if let fetchedKategorien = try? modelContext.fetch(request) {
+            if fetchedKategorien.isEmpty {
+                addDefaultKategorien()
+            } else {
+                self.kategorien = fetchedKategorien
+            }
+            
+        }
+    }
+    
     func addDefaultWochentage() {
-        let tage = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
-        let defaultWochentage = tage.map { Wochentag(name: $0, gerichte: []) }
-        for tag in defaultWochentage {
+        for tag in standardWochentage {
             modelContext?.insert(tag)
         }
         try? modelContext?.save()
-        self.wochentage = defaultWochentage
+        self.wochentage = standardWochentage
         sortWochentage()
+    }
+
+    func addDefaultKategorien() {
+        let defaultKategorien: [Kategorie] = standardKategorien
+        for kategorie in defaultKategorien {
+            modelContext?.insert(kategorie)
+        }
+        try? modelContext?.save()
+        self.kategorien = defaultKategorien
+    }
+    
+    func selectedKategorieName(for kategorie: Kategorie?) -> String {
+        return kategorie?.name ?? "Kategorie"
+    }
+    
+    func zutatenNachKategorien() -> [Kategorie: [Zutat]] {
+        let kategorisierteZutaten = Dictionary(grouping: alleZutaten, by: { $0.kategorie ?? Kategorie(name: "Ohne Kategorie") })
+        return kategorisierteZutaten
     }
     
     func sortWochentage() {
@@ -83,6 +136,7 @@ class WochenplanViewModel: ObservableObject {
         }
     }
     
+    //Refactoring und verschieben über Tage hinweg
     func moveGericht(within tag: Wochentag, from indices: IndexSet, to newOffset: Int) {
         guard let sourceIndex = indices.first,
               let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }) else { return }
@@ -105,28 +159,22 @@ class WochenplanViewModel: ObservableObject {
     }
     
     func toggleZutatErledigt(zutat: Zutat) {
-        // Suche den entsprechenden Wochentag
         if let tagIndex = wochentage.firstIndex(where: {
             $0.gerichte.contains(where: {
                 $0.zutaten.contains(where: { $0.id == zutat.id })
             })
         }) {
-            // Suche das Gericht innerhalb des Wochentages
             for (gerichtIndex, gericht) in wochentage[tagIndex].gerichte.enumerated() {
                 if let zutatIndex = gericht.zutaten.firstIndex(where: { $0.id == zutat.id }) {
-                    // Ändere den Status der gefundenen Zutat
                     wochentage[tagIndex].gerichte[gerichtIndex].zutaten[zutatIndex].erledigt.toggle()
                     
-                    // Speichere die Änderungen im ModelContext
                     saveTag(tag: wochentage[tagIndex])
                     break
                 }
             }
         }
     }
-
     
-    // Funktion, um alle Zutaten als erledigt zu markieren
     func markiereAllesErledigt() {
         for tagIndex in 0..<wochentage.count {
             for gerichtIndex in 0..<wochentage[tagIndex].gerichte.count {

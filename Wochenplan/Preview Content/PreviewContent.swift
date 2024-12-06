@@ -9,85 +9,93 @@ import Foundation
 import SwiftUI
 
 struct PreviewContent {
+    
+    static let standardKategorien = [
+        Kategorie(name: "Obst & Gemüse"),
+        Kategorie(name: "Kühltheke"),
+        Kategorie(name: "Dosen")
+    ]
+    
     static let zutatenSpaghettiBolognese = [
-        Zutat(name: "Spaghetti"),
-        Zutat(name: "Hackfleisch"),
-        Zutat(name: "Tomatensauce"),
-        Zutat(name: "Zwiebeln"),
-        Zutat(name: "Knoblauch")
-    ]
-    
-    static let zutatenCaesarSalad = [
-        Zutat(name: "Römersalat"),
-        Zutat(name: "Hähnchenbrust"),
-        Zutat(name: "Croutons"),
-        Zutat(name: "Parmesan"),
-        Zutat(name: "Caesar Dressing")
-    ]
-    
-    static let zutatenHähnchenCurry = [
-        Zutat(name: "Hähnchenbrust"),
-        Zutat(name: "Curry"),
-        Zutat(name: "Kokosmilch"),
-        Zutat(name: "Paprika"),
-        Zutat(name: "Reis")
-    ]
+            Zutat(name: "Spaghetti", erledigt: false, kategorie: standardKategorien[2]),
+            Zutat(name: "Hackfleisch", erledigt: false, kategorie: standardKategorien[1]),
+            Zutat(name: "Tomatensauce", erledigt: false, kategorie: standardKategorien[2]),
+            Zutat(name: "Zwiebeln", erledigt: false, kategorie: standardKategorien[0]),
+            Zutat(name: "Knoblauch", erledigt: false, kategorie: standardKategorien[0])
+        ]
+
+        static let zutatenCaesarSalad = [
+            Zutat(name: "Römersalat", erledigt: false, kategorie: standardKategorien[0]),
+            Zutat(name: "Hähnchenbrust", erledigt: false, kategorie: standardKategorien[1]),
+            Zutat(name: "Croutons", erledigt: false, kategorie: nil),
+            Zutat(name: "Parmesan", erledigt: false, kategorie: standardKategorien[1]),
+            Zutat(name: "Caesar Dressing", erledigt: false, kategorie: standardKategorien[1])
+        ]
+
+        static let zutatenHähnchenCurry = [
+            Zutat(name: "Hähnchenbrust", erledigt: false, kategorie: standardKategorien[1]),
+            Zutat(name: "Curry", erledigt: false, kategorie: nil),
+            Zutat(name: "Kokosmilch", erledigt: false, kategorie: standardKategorien[2]),
+            Zutat(name: "Paprika", erledigt: false, kategorie: standardKategorien[0]),
+            Zutat(name: "Reis", erledigt: false, kategorie: standardKategorien[2])
+        ]
     
     static let zutatenGemüseLasagne = [
-        Zutat(name: "Lasagneblätter"),
-        Zutat(name: "Zucchini"),
-        Zutat(name: "Auberginen"),
-        Zutat(name: "Tomaten"),
-        Zutat(name: "Béchamelsauce")
+        Zutat(name: "Lasagneblätter", erledigt: false, kategorie: standardKategorien[2]),
+        Zutat(name: "Zucchini", erledigt: false, kategorie: standardKategorien[0]),
+        Zutat(name: "Auberginen", erledigt: false, kategorie: standardKategorien[0]),
+        Zutat(name: "Tomaten", erledigt: false, kategorie: standardKategorien[0]),
+        Zutat(name: "Béchamelsauce", erledigt: false, kategorie: standardKategorien[2])
     ]
-    
+
     static let zutatenLachsfilet = [
-        Zutat(name: "Lachs"),
-        Zutat(name: "Zitronensaft"),
-        Zutat(name: "Kräuter"),
-        Zutat(name: "Kartoffeln"),
-        Zutat(name: "Brokkoli")
+        Zutat(name: "Lachs", erledigt: false, kategorie: standardKategorien[1]),
+        Zutat(name: "Zitronensaft", erledigt: false, kategorie: nil),
+        Zutat(name: "Kräuter", erledigt: false, kategorie: nil),
+        Zutat(name: "Kartoffeln", erledigt: false, kategorie: standardKategorien[0]),
+        Zutat(name: "Brokkoli", erledigt: false, kategorie: standardKategorien[0])
     ]
-    
+
     static let zutatenPizzaMargherita = [
-        Zutat(name: "Pizzateig"),
-        Zutat(name: "Tomatensauce"),
-        Zutat(name: "Mozzarella"),
-        Zutat(name: "Basilikum")
+        Zutat(name: "Pizzateig", erledigt: false, kategorie: standardKategorien[2]),
+        Zutat(name: "Tomatensauce", erledigt: false, kategorie: standardKategorien[2]),
+        Zutat(name: "Mozzarella", erledigt: false, kategorie: standardKategorien[1]),
+        Zutat(name: "Basilikum", erledigt: false, kategorie: standardKategorien[0])
     ]
-    
+
     static let zutatenVegetarischerBurger = [
-        Zutat(name: "Vegetarische Patties"),
-        Zutat(name: "Burgerbrötchen"),
-        Zutat(name: "Salat"),
-        Zutat(name: "Tomaten"),
-        Zutat(name: "Ketchup")
+        Zutat(name: "Vegetarische Patties", erledigt: false, kategorie: standardKategorien[1]),
+        Zutat(name: "Burgerbrötchen", erledigt: false, kategorie: standardKategorien[2]),
+        Zutat(name: "Salat", erledigt: false, kategorie: standardKategorien[0]),
+        Zutat(name: "Tomaten", erledigt: false, kategorie: standardKategorien[0]),
+        Zutat(name: "Ketchup", erledigt: false, kategorie: standardKategorien[2])
     ]
-    
+
     static let zutatenTacos = [
-        Zutat(name: "Taco-Schalen"),
-        Zutat(name: "Hackfleisch"),
-        Zutat(name: "Käse"),
-        Zutat(name: "Tomaten"),
-        Zutat(name: "Salat"),
-        Zutat(name: "Salsa")
+        Zutat(name: "Taco-Schalen", erledigt: false, kategorie: standardKategorien[2]),
+        Zutat(name: "Hackfleisch", erledigt: false, kategorie: standardKategorien[1]),
+        Zutat(name: "Käse", erledigt: false, kategorie: standardKategorien[1]),
+        Zutat(name: "Tomaten", erledigt: false, kategorie: standardKategorien[0]),
+        Zutat(name: "Salat", erledigt: false, kategorie: standardKategorien[0]),
+        Zutat(name: "Salsa", erledigt: false, kategorie: standardKategorien[2])
     ]
-    
+
     static let zutatenBratenMitKnödeln = [
-        Zutat(name: "Schweinebraten"),
-        Zutat(name: "Kartoffeln"),
-        Zutat(name: "Mehl"),
-        Zutat(name: "Eier"),
-        Zutat(name: "Sauerkraut")
+        Zutat(name: "Schweinebraten", erledigt: false, kategorie: standardKategorien[1]),
+        Zutat(name: "Kartoffeln", erledigt: false, kategorie: standardKategorien[0]),
+        Zutat(name: "Mehl", erledigt: false, kategorie: standardKategorien[2]),
+        Zutat(name: "Eier", erledigt: false, kategorie: standardKategorien[1]),
+        Zutat(name: "Sauerkraut", erledigt: false, kategorie: standardKategorien[0])
     ]
-    
+
     static let zutatenPfannkuchen = [
-        Zutat(name: "Mehl"),
-        Zutat(name: "Eier"),
-        Zutat(name: "Milch"),
-        Zutat(name: "Zucker"),
-        Zutat(name: "Vanillezucker")
+        Zutat(name: "Mehl", erledigt: false, kategorie: standardKategorien[2]),
+        Zutat(name: "Eier", erledigt: false, kategorie: standardKategorien[1]),
+        Zutat(name: "Milch", erledigt: false, kategorie: standardKategorien[1]),
+        Zutat(name: "Zucker", erledigt: false, kategorie: standardKategorien[2]),
+        Zutat(name: "Vanillezucker", erledigt: false, kategorie: standardKategorien[2])
     ]
+
     
     static let exampleGerichteMontag = [
         Gericht(name: "Spaghetti Bolognese", zutaten: zutatenSpaghettiBolognese),

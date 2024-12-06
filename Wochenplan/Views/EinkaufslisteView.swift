@@ -33,14 +33,28 @@ struct EinkaufslisteView: View {
                         List(viewModel.alleZutaten, id: \.id) { zutat in
                             EinkaufslisteRow(
                                 zutat: zutat,
-                                isChecked: checkedItems[zutat.id] ?? false,
+                                isChecked: zutat.erledigt,
                                 toggleAction: {
-                                    checkedItems[zutat.id] = !(checkedItems[zutat.id] ?? false)
                                     viewModel.toggleZutatErledigt(zutat: zutat)
                                 }
                             )
                             .listRowBackground(Color.secondary)
                         }
+                        
+//                        ForEach(viewModel.zutatenNachKategorien().keys.sorted(by: { $0.name < $1.name }), id: \.id) { kategorie in
+//                            Section(header: Text(kategorie.name)) {
+//                                ForEach(viewModel.zutatenNachKategorien()[kategorie] ?? []) { zutat in
+//                                    EinkaufslisteRow(
+//                                        zutat: zutat,
+//                                        isChecked: checkedItems[zutat.id] ?? false,
+//                                        toggleAction: {
+//                                            checkedItems[zutat.id] = !(checkedItems[zutat.id] ?? false)
+//                                            viewModel.toggleZutatErledigt(zutat: zutat)
+//                                        }
+//                                    )
+//                                }
+//                            }
+//                        }
                     }
                     .navigationTitle("Einkaufsliste")
                     .scrollContentBackground(.hidden)
