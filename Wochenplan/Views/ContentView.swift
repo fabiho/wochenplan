@@ -9,7 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @EnvironmentObject var viewModel: WochenplanViewModel
+    @EnvironmentObject var wochentageViewModel: WochentageViewModel
+    @EnvironmentObject var gerichteViewModel: GerichteViewModel
     @State private var isShowingAddGericht = false
     @State private var selectedGericht: Gericht?
     @State private var selectedWochentag: Wochentag?
@@ -18,11 +19,11 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                if viewModel.wochentage.allSatisfy({ $0.gerichte.isEmpty }) {
+                if wochentageViewModel.wochentage.allSatisfy({ $0.gerichte.isEmpty }) {
                     EmptyWochenplanView()
                 } else {
                     List {
-                        ForEach(viewModel.wochentage) { tag in
+                        ForEach(wochentageViewModel.wochentage) { tag in
                             if !tag.gerichte.isEmpty {
                                 Section(header: Text(tag.name)) {
                                     ForEach(tag.gerichte) { gericht in
@@ -34,10 +35,10 @@ struct ContentView: View {
                                         .foregroundColor(Color.white)
                                     }
                                     .onMove { indices, newOffset in
-                                        viewModel.moveGericht(within: tag, from: indices, to: newOffset)
+                                        wochentageViewModel.moveGericht(within: tag, from: indices, to: newOffset)
                                     }
                                     .onDelete { indices in
-                                        viewModel.deleteGericht(at: indices, from: tag)
+                                        wochentageViewModel.deleteGericht(at: indices, from: tag)
                                     }
                                 }
                             }
@@ -56,14 +57,14 @@ struct ContentView: View {
                     }
                 }
                 .sheet(isPresented: $isShowingAddGericht) {
-                    AddGerichtView(viewModel: viewModel)
+                    AddGerichtView(gerichteViewModel: gerichteViewModel, wochentageViewModel: wochentageViewModel)
                 }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button(action: {
-                            viewModel.deleteAllGerichte()
+                            wochentageViewModel.deleteAllGerichte()
                         }) {
                             Label("Alle Gerichte löschen", systemImage: "trash.fill")
                                 .foregroundColor(.red)

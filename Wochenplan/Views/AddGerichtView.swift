@@ -10,16 +10,15 @@ import SwiftData
 
 struct AddGerichtView: View {
     @Environment(\.presentationMode) var presentationMode
-    @ObservedObject var viewModel: WochenplanViewModel
+    @ObservedObject var gerichteViewModel: GerichteViewModel
+    @ObservedObject var wochentageViewModel: WochentageViewModel
     @State private var selectedWochentagIndex: Int = 0
     @State private var selectedKategorie: Kategorie?
-//    @State private var alleKategorien: [Kategorie] = []
     @State private var gerichtName: String = ""
-    @State private var zutaten: [Zutat] = [Zutat(name: "", erledigt: false, kategorie: nil )]
+    @State private var zutaten: [Zutat] = [Zutat(name: "", erledigt: false, kategorie: nil)]
     
     @Query(sort: \Kategorie.name, order: .forward) private var alleKategorien: [Kategorie]
     
-    // Fokussiert den Fokus auf jedes Textfeld
     @FocusState private var focusedField: Int?
     
     var body: some View {
@@ -35,12 +34,14 @@ struct AddGerichtView: View {
                                     focusedField = 0
                                 }
                             }
-                        WochentagSelectorView(wochentage: viewModel.wochentage, selectedIndex: $selectedWochentagIndex)
+                        
+                        // Wochentag auswählen
+                        WochentagSelectorView(wochentage: wochentageViewModel.wochentage, selectedIndex: $selectedWochentagIndex)
                     }
                     .listRowBackground(Color.primary)
                     
                     Section(header: Text("Zutaten")) {
-                        ZutatenListView(zutaten: $zutaten, focusedField: $focusedField, kategorien: alleKategorien, viewModel: viewModel)
+                        ZutatenListView(zutaten: $zutaten, focusedField: $focusedField, kategorien: alleKategorien, gerichteViewModel: gerichteViewModel)
                     }
                     .listRowBackground(Color.primary)
                     
@@ -53,12 +54,17 @@ struct AddGerichtView: View {
                         
                         SaveButtonView(
                             action: {
+                                // Neue Zutaten filtern und Gericht erstellen
                                 let neueZutaten = zutaten
                                     .filter { !$0.name.isEmpty }
-                                    .map { Zutat(name: $0.name, erledigt: false, kategorie: selectedKategorie)}
+                                    .map { Zutat(name: $0.name, erledigt: false, kategorie: selectedKategorie) }
                                 let neuesGericht = Gericht(name: gerichtName, zutaten: neueZutaten)
-                                let selectedTag = viewModel.wochentage[selectedWochentagIndex]
-                                viewModel.addGericht(to: selectedTag, gericht: neuesGericht)
+                                
+                                // Gericht dem ausgewählten Wochentag hinzufügen
+                                let selectedTag = wochentageViewModel.wochentage[selectedWochentagIndex]
+                                wochentageViewModel.addGericht(to: selectedTag, gericht: neuesGericht)
+                                
+                                // Zurück zur vorherigen Ansicht
                                 presentationMode.wrappedValue.dismiss()
                             },
                             isDisabled: gerichtName.isEmpty
@@ -71,3 +77,4 @@ struct AddGerichtView: View {
         }
     }
 }
+

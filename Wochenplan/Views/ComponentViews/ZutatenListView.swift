@@ -12,7 +12,7 @@ struct ZutatenListView: View {
     @Binding var zutaten: [Zutat]
     var focusedField: FocusState<Int?>.Binding
     var kategorien: [Kategorie]
-    @ObservedObject var viewModel: WochenplanViewModel
+    @ObservedObject var zutatenViewModel: ZutatenViewModel
     
     var body: some View {
         ForEach(zutaten.indices, id: \.self) { index in
@@ -39,6 +39,7 @@ struct ZutatenListView: View {
                 
                 Spacer()
 
+                // Kategorien-Menü für jede Zutat
                 Menu {
                     ForEach(kategorien, id: \.id) { kategorie in
                         Button(action: {
@@ -49,7 +50,8 @@ struct ZutatenListView: View {
                     }
                 } label: {
                     HStack {
-                        Text(viewModel.selectedKategorieName(for: zutaten[index].kategorie))
+                        // Anzeige der aktuell zugewiesenen Kategorie oder Platzhalter
+                        Text(zutatenViewModel.selectedKategorieName(for: zutaten[index].kategorie))
                         Image(systemName: "chevron.down") // Pfeil hinzufügen
                     }
                     .foregroundColor(.white)
@@ -64,4 +66,5 @@ struct ZutatenListView: View {
         }
     }
 }
+
 

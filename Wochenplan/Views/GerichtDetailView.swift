@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct GerichtDetailView: View {
-    @EnvironmentObject var viewModel: WochenplanViewModel
+    @EnvironmentObject var gerichteViewModel: GerichteViewModel
     var gericht: Gericht
     var wochentag: Wochentag
     
@@ -47,7 +47,7 @@ struct GerichtDetailView: View {
                         .onDelete { indexSet in
                             if let index = indexSet.first {
                                 let zutatToDelete = gericht.zutaten[index]
-                                viewModel.deleteZutat(from: gericht, in: wochentag, zutat: zutatToDelete)
+                                gerichteViewModel.deleteZutat(from: gericht, in: wochentag, zutat: zutatToDelete)
                             }
                         }
                     }
