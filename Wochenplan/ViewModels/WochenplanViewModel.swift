@@ -29,14 +29,6 @@ class WochenplanViewModel: ObservableObject {
         "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"
     ]
     
-    let standardKategorien = [
-        Kategorie(name: "Obst & Gemüse"),
-        Kategorie(name: "Kühltheke"),
-        Kategorie(name: "Dosen"),
-        Kategorie(name: "Brot & Backwaren"),
-        Kategorie(name: "Getränke")
-    ]
-    
     var alleZutaten: [Zutat] {
         return wochentage
             .flatMap { $0.gerichte.flatMap { $0.zutaten } }
@@ -46,16 +38,14 @@ class WochenplanViewModel: ObservableObject {
     init(context: ModelContext?) {
         self.modelContext = context
         loadWochentage()
-        if kategorien.isEmpty {
-            loadKategorien()
-        }
-        
+//        loadKategorien()
     }
     
     // Initialisierer für Preview oder Test
     convenience init(previewData: [Wochentag] = []) {
         self.init(context: nil)
         self.wochentage = previewData
+        //kategorien in previewData einbauen und abrufen
     }
     
     func loadWochentage() {
@@ -75,23 +65,6 @@ class WochenplanViewModel: ObservableObject {
         }
     }
     
-    func loadKategorien() {
-        guard let modelContext = modelContext else {
-            print("ModelContext ist nicht verfügbar.")
-            return
-        }
-        
-        let request = FetchDescriptor<Kategorie>()
-        if let fetchedKategorien = try? modelContext.fetch(request) {
-            if fetchedKategorien.isEmpty {
-                addDefaultKategorien()
-            } else {
-                self.kategorien = fetchedKategorien
-            }
-            
-        }
-    }
-    
     func addDefaultWochentage() {
         for tag in standardWochentage {
             modelContext?.insert(tag)
@@ -99,24 +72,6 @@ class WochenplanViewModel: ObservableObject {
         try? modelContext?.save()
         self.wochentage = standardWochentage
         sortWochentage()
-    }
-
-    func addDefaultKategorien() {
-        let defaultKategorien: [Kategorie] = standardKategorien
-        for kategorie in defaultKategorien {
-            modelContext?.insert(kategorie)
-        }
-        try? modelContext?.save()
-        self.kategorien = defaultKategorien
-    }
-    
-    func selectedKategorieName(for kategorie: Kategorie?) -> String {
-        return kategorie?.name ?? "Kategorie"
-    }
-    
-    func zutatenNachKategorien() -> [Kategorie: [Zutat]] {
-        let kategorisierteZutaten = Dictionary(grouping: alleZutaten, by: { $0.kategorie ?? Kategorie(name: "Ohne Kategorie") })
-        return kategorisierteZutaten
     }
     
     func sortWochentage() {
@@ -159,57 +114,49 @@ class WochenplanViewModel: ObservableObject {
     }
     
     func toggleZutatErledigt(zutat: Zutat) {
-        if let tagIndex = wochentage.firstIndex(where: {
-            $0.gerichte.contains(where: {
-                $0.zutaten.contains(where: { $0.id == zutat.id })
-            })
-        }) {
-            for (gerichtIndex, gericht) in wochentage[tagIndex].gerichte.enumerated() {
-                if let zutatIndex = gericht.zutaten.firstIndex(where: { $0.id == zutat.id }) {
-                    wochentage[tagIndex].gerichte[gerichtIndex].zutaten[zutatIndex].erledigt.toggle()
-                    
-                    saveTag(tag: wochentage[tagIndex])
-                    break
-                }
+        for tag in wochentage {
+            if let gericht = tag.gerichte.first(where: { $0.zutaten.contains(where: { $0.id == zutat.id }) }),
+               let zutatIndex = gericht.zutaten.firstIndex(where: { $0.id == zutat.id }) {
+                gericht.zutaten[zutatIndex].erledigt.toggle()
+                saveTag(tag: tag)
+                return
             }
         }
     }
     
     func markiereAllesErledigt() {
-        for tagIndex in 0..<wochentage.count {
-            for gerichtIndex in 0..<wochentage[tagIndex].gerichte.count {
-                for zutatIndex in 0..<wochentage[tagIndex].gerichte[gerichtIndex].zutaten.count {
-                    wochentage[tagIndex].gerichte[gerichtIndex].zutaten[zutatIndex].erledigt = true
-                }
-            }
-        }
+        let alleZutaten = wochentage.flatMap { $0.gerichte.flatMap { $0.zutaten } }
+        alleZutaten.forEach { $0.erledigt = true }
         try? modelContext?.save()
     }
+
     
     func deleteAllGerichte() {
+        guard let modelContext = modelContext else {
+            print("ModelContext ist nicht verfügbar.")
+            return
+        }
+        
         for wochentag in wochentage {
             for gericht in wochentag.gerichte {
-                modelContext?.delete(gericht)
+                modelContext.delete(gericht)
             }
             wochentag.gerichte.removeAll()
         }
-        try? modelContext?.save()
+        
+        do {
+            try modelContext.save()
+        } catch {
+            print("Fehler beim Speichern nach dem Löschen der Gerichte: \(error)")
+        }
     }
+
     
     func deleteZutat(from gericht: Gericht, in tag: Wochentag, zutat: Zutat) {
         if let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }),
            let gerichtIndex = wochentage[tagIndex].gerichte.firstIndex(where: { $0.id == gericht.id }) {
             wochentage[tagIndex].gerichte[gerichtIndex].zutaten.removeAll { $0 == zutat }
             saveTag(tag: wochentage[tagIndex])
-        }
-    }
-    
-    func toggleZutatErledigt(zutat: Zutat, in gericht: Gericht) {
-        if let gerichtIndex = gerichte.firstIndex(where: { $0.id == gericht.id }) {
-            if let zutatIndex = gerichte[gerichtIndex].zutaten.firstIndex(where: { $0.id == zutat.id }) {
-                gerichte[gerichtIndex].zutaten[zutatIndex].erledigt.toggle()
-                saveGericht(gericht: gerichte[gerichtIndex])
-            }
         }
     }
     

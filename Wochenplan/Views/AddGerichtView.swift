@@ -12,12 +12,8 @@ struct AddGerichtView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var viewModel: WochenplanViewModel
     @State private var selectedWochentagIndex: Int = 0
-    @State private var selectedKategorie: Kategorie?
-//    @State private var alleKategorien: [Kategorie] = []
     @State private var gerichtName: String = ""
     @State private var zutaten: [Zutat] = [Zutat(name: "", erledigt: false, kategorie: nil )]
-    
-    @Query(sort: \Kategorie.name, order: .forward) private var alleKategorien: [Kategorie]
     
     // Fokussiert den Fokus auf jedes Textfeld
     @FocusState private var focusedField: Int?
@@ -40,7 +36,7 @@ struct AddGerichtView: View {
                     .listRowBackground(Color.primary)
                     
                     Section(header: Text("Zutaten")) {
-                        ZutatenListView(zutaten: $zutaten, focusedField: $focusedField, kategorien: alleKategorien, viewModel: viewModel)
+                        ZutatenListView(zutaten: $zutaten, focusedField: $focusedField, viewModel: viewModel)
                     }
                     .listRowBackground(Color.primary)
                     
@@ -55,7 +51,8 @@ struct AddGerichtView: View {
                             action: {
                                 let neueZutaten = zutaten
                                     .filter { !$0.name.isEmpty }
-                                    .map { Zutat(name: $0.name, erledigt: false, kategorie: selectedKategorie)}
+                                    .map {zutat in
+                                        Zutat(name: zutat.name, erledigt: false, kategorie: zutat.kategorie)}
                                 let neuesGericht = Gericht(name: gerichtName, zutaten: neueZutaten)
                                 let selectedTag = viewModel.wochentage[selectedWochentagIndex]
                                 viewModel.addGericht(to: selectedTag, gericht: neuesGericht)

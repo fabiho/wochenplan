@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct GerichtDetailView: View {
     @EnvironmentObject var viewModel: WochenplanViewModel
@@ -36,6 +37,11 @@ struct GerichtDetailView: View {
                             HStack {
                                 Text(zutat.name)
                                 Spacer()
+                                
+                                if let kategorie = zutat.kategorie {
+                                    Text("\(kategorie)")
+                                }
+
                                 Image("bread") // Icon der Kategorie
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)

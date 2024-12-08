@@ -24,17 +24,6 @@ class Zutat {
 }
 
 @Model
-class Kategorie {
-    @Attribute(.unique) var id: UUID
-    var name: String
-    
-    init(name: String) {
-        self.id = UUID()
-        self.name = name
-    }
-}
-
-@Model
 class Gericht {
     @Attribute(.unique) var id: UUID
     var name: String

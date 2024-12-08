@@ -11,7 +11,7 @@ import SwiftUI
 struct ZutatenListView: View {
     @Binding var zutaten: [Zutat]
     var focusedField: FocusState<Int?>.Binding
-    var kategorien: [Kategorie]
+//    var kategorien: [Kategorie]
     @ObservedObject var viewModel: WochenplanViewModel
     
     var body: some View {
@@ -31,26 +31,24 @@ struct ZutatenListView: View {
                 .onSubmit {
                     if index < zutaten.count - 1 {
                         focusedField.wrappedValue = index + 1
-                    } else if index == zutaten.count - 1 && !zutaten[index].name.isEmpty {
-                        zutaten.append(Zutat(name: "", erledigt: false, kategorie: nil))
-                        focusedField.wrappedValue = zutaten.count - 1
                     }
                 }
                 
                 Spacer()
 
                 Menu {
-                    ForEach(kategorien, id: \.id) { kategorie in
+                    ForEach(Kategorie.allCases, id: \.self) { kategorie in
                         Button(action: {
                             zutaten[index].kategorie = kategorie
-                        }) {
-                            Text(kategorie.name)
+                        })
+                        {
+                            Text("\(kategorie)")
                         }
                     }
                 } label: {
                     HStack {
-                        Text(viewModel.selectedKategorieName(for: zutaten[index].kategorie))
-                        Image(systemName: "chevron.down") // Pfeil hinzufügen
+                        Text(zutaten[index].kategorie?.rawValue ?? "Kategorie")
+                        Image(systemName: "chevron.down")
                     }
                     .foregroundColor(.white)
                 }

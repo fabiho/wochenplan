@@ -14,9 +14,10 @@ struct EinkaufslisteView: View {
     
     var progress: Double {
         let totalItems = viewModel.alleZutaten.count
-        let checkedCount = checkedItems.values.filter { $0 }.count
+        let checkedCount = viewModel.alleZutaten.filter { $0.erledigt }.count
         return totalItems > 0 ? Double(checkedCount) / Double(totalItems) : 0
     }
+    
     
     var body: some View {
         NavigationView {
@@ -30,7 +31,7 @@ struct EinkaufslisteView: View {
                             .padding()
                             .accentColor(Color.primary)
                         
-                        List(viewModel.alleZutaten, id: \.id) { zutat in
+                        List(viewModel.alleZutaten.sorted(by: { $0.id.uuidString < $1.id.uuidString }), id: \.id) { zutat in
                             EinkaufslisteRow(
                                 zutat: zutat,
                                 isChecked: zutat.erledigt,
@@ -40,21 +41,6 @@ struct EinkaufslisteView: View {
                             )
                             .listRowBackground(Color.secondary)
                         }
-                        
-//                        ForEach(viewModel.zutatenNachKategorien().keys.sorted(by: { $0.name < $1.name }), id: \.id) { kategorie in
-//                            Section(header: Text(kategorie.name)) {
-//                                ForEach(viewModel.zutatenNachKategorien()[kategorie] ?? []) { zutat in
-//                                    EinkaufslisteRow(
-//                                        zutat: zutat,
-//                                        isChecked: checkedItems[zutat.id] ?? false,
-//                                        toggleAction: {
-//                                            checkedItems[zutat.id] = !(checkedItems[zutat.id] ?? false)
-//                                            viewModel.toggleZutatErledigt(zutat: zutat)
-//                                        }
-//                                    )
-//                                }
-//                            }
-//                        }
                     }
                     .navigationTitle("Einkaufsliste")
                     .scrollContentBackground(.hidden)
