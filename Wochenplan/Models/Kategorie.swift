@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum Kategorie: String, Codable, CaseIterable {
 
@@ -15,4 +16,21 @@ enum Kategorie: String, Codable, CaseIterable {
     case Brot = "Brot & Backwaren"
     case Getränke = "Getränke"
     case Nudeln = "Nudeln & Reis"
+    
+    var image: Image {
+        switch self {
+        case .Obst:
+            return Image("apple")
+        case .Kühltheke:
+            return Image("cheese")
+        case .Dosen:
+            return Image("can")
+        case .Brot:
+            return Image("bread")
+        case .Getränke:
+            return Image("milk")
+        case .Nudeln:
+            return Image("noodle")
+        }
+    }
 }

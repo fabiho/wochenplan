@@ -34,19 +34,32 @@ struct ZutatenListView: View {
                 }
                 
                 Spacer()
-
+                
                 Menu {
                     ForEach(Kategorie.allCases, id: \.self) { kategorie in
                         Button(action: {
                             zutaten[index].kategorie = kategorie
                         })
                         {
-                            Text("\(kategorie)")
+                            HStack {
+                                kategorie.image
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 24, height: 24)
+                                Text("\(kategorie.rawValue)")
+                            }
                         }
                     }
                 } label: {
                     HStack {
-                        Text(zutaten[index].kategorie?.rawValue ?? "Kategorie")
+                        if let kategorie = zutaten[index].kategorie {
+                            kategorie.image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                        } else {
+                            Text("Kategorie")
+                        }
                         Image(systemName: "chevron.down")
                     }
                     .foregroundColor(.white)

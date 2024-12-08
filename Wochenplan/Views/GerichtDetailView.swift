@@ -14,10 +14,8 @@ struct GerichtDetailView: View {
     var wochentag: Wochentag
     
     var body: some View {
-        
         ZStack {
             VStack(alignment: .leading, spacing: 10) {
-                
                 Text(gericht.name)
                     .font(.largeTitle)
                     .fontWeight(.bold)
@@ -39,13 +37,11 @@ struct GerichtDetailView: View {
                                 Spacer()
                                 
                                 if let kategorie = zutat.kategorie {
-                                    Text("\(kategorie)")
+                                    kategorie.image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                        .frame(height: 30)
                                 }
-
-                                Image("bread") // Icon der Kategorie
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(height: 30)
                             }
                             .listRowBackground(Color.primary)
                             .foregroundColor(Color.white)
@@ -65,6 +61,7 @@ struct GerichtDetailView: View {
             .navigationBarTitleDisplayMode(.inline)
         }
     }
+    
 }
 
 
