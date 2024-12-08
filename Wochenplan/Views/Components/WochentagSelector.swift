@@ -8,18 +8,18 @@
 import Foundation
 import SwiftUI
 
-struct WochentagSelectorView: View {
+struct WochentagSelector: View {
     var wochentage: [Wochentag]
     @Binding var selectedIndex: Int
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                ForEach(0..<wochentage.count, id: \.self) { index in
+                ForEach(wochentage.indices, id: \.self) { index in
                     Button(action: {
                         selectedIndex = index
                     }) {
-                        Text(wochentage[index].name)
+                        Text(wochentage[index].rawValue)
                             .padding(10)
                             .background(selectedIndex == index ? Color.secondary : Color.secondary.opacity(0.4))
                             .foregroundColor(Color.white)

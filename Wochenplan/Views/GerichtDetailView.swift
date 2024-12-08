@@ -24,7 +24,7 @@ struct GerichtDetailView: View {
                 
                 HStack{
                     Image(systemName: "calendar")
-                    Text((wochentag.name))
+                    Text("\(wochentag)")
                         .font(.title3)
                 }
                 .foregroundStyle(Color.gray)

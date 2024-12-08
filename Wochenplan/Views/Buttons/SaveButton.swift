@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct SaveButtonView: View {
+struct SaveButton: View {
     var action: () -> Void
     var isDisabled: Bool = false
     

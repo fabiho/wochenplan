@@ -14,4 +14,5 @@ enum Kategorie: String, Codable, CaseIterable {
     case Dosen = "Dosen"
     case Brot = "Brot & Backwaren"
     case Getränke = "Getränke"
+    case Nudeln = "Nudeln & Reis"
 }

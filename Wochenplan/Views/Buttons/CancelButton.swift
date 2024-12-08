@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct CancelButtonView: View {
+struct CancelButton: View {
     var action: () -> Void
     
     var body: some View {

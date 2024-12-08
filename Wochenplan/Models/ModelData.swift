@@ -28,24 +28,26 @@ class Gericht {
     @Attribute(.unique) var id: UUID
     var name: String
     var zutaten: [Zutat]
+    var wochentag: Wochentag?
 
-    init(name: String, zutaten: [Zutat]) {
+    init(name: String, zutaten: [Zutat], wochentag: Wochentag?) {
         self.id = UUID()
         self.name = name
         self.zutaten = zutaten
+        self.wochentag = wochentag
     }
 }
 
-@Model
-class Wochentag {
-    @Attribute(.unique) var id: UUID
-    var name: String
-    var gerichte: [Gericht]
-
-    init(name: String, gerichte: [Gericht] = []) {
-        self.id = UUID()
-        self.name = name
-        self.gerichte = gerichte
-    }
-}
+//@Model
+//class Wochentag {
+//    @Attribute(.unique) var id: UUID
+//    var name: String
+//    var gerichte: [Gericht]
+//
+//    init(name: String, gerichte: [Gericht] = []) {
+//        self.id = UUID()
+//        self.name = name
+//        self.gerichte = gerichte
+//    }
+//}
 

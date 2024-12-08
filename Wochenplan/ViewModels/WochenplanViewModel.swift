@@ -10,138 +10,112 @@ import SwiftUI
 import SwiftData
 
 class WochenplanViewModel: ObservableObject {
-    @Published var wochentage: [Wochentag] = []
+    @Published var wochentage: [Wochentag: [Gericht]] = [:]
     @Published var gerichte: [Gericht] = []
     @Published var kategorien: [Kategorie] = []
     private var modelContext: ModelContext?
     
-    let standardWochentage = [
-        Wochentag(name: "Montag", gerichte: []),
-        Wochentag(name: "Dienstag", gerichte: []),
-        Wochentag(name: "Mittwoch", gerichte: []),
-        Wochentag(name: "Donnerstag", gerichte: []),
-        Wochentag(name: "Freitag", gerichte: []),
-        Wochentag(name: "Samstag", gerichte: []),
-        Wochentag(name: "Sonntag", gerichte: [])
-    ]
-    
-    let wochentagReihenfolge: [String] = [
-        "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"
-    ]
-    
     var alleZutaten: [Zutat] {
         return wochentage
-            .flatMap { $0.gerichte.flatMap { $0.zutaten } }
+            .flatMap { (_, gerichte) in gerichte.flatMap { $0.zutaten } }
     }
-    
+
     // Standard-Initialisierer
     init(context: ModelContext?) {
         self.modelContext = context
-        loadWochentage()
-//        loadKategorien()
+        self.wochentage = Dictionary(uniqueKeysWithValues: Wochentag.allCases.map { ($0, []) })
+        loadSavedGerichte()
     }
     
     // Initialisierer für Preview oder Test
-    convenience init(previewData: [Wochentag] = []) {
+    convenience init(previewData: [Wochentag: [Gericht]]) {
         self.init(context: nil)
         self.wochentage = previewData
-        //kategorien in previewData einbauen und abrufen
     }
     
-    func loadWochentage() {
-        guard let modelContext = modelContext else {
-            print("ModelContext ist nicht verfügbar.")
-            return
-        }
-        
-        let request = FetchDescriptor<Wochentag>()
-        if let fetchedWochentage = try? modelContext.fetch(request) {
-            if fetchedWochentage.isEmpty {
-                addDefaultWochentage()
-            } else {
-                self.wochentage = fetchedWochentage
-                sortWochentage()
+    private func loadSavedGerichte() {
+        do {
+            let fetchDescriptor = FetchDescriptor<Gericht>()
+            let gespeicherteGerichte: [Gericht] = try modelContext?.fetch(fetchDescriptor) ?? []
+            
+            for gericht in gespeicherteGerichte {
+                if let tag = gericht.wochentag {
+                    wochentage[tag]?.append(gericht)
+                }
             }
+        } catch {
+            print("Fehler beim Laden der gespeicherten Gerichte: \(error)")
         }
     }
-    
-    func addDefaultWochentage() {
-        for tag in standardWochentage {
-            modelContext?.insert(tag)
-        }
-        try? modelContext?.save()
-        self.wochentage = standardWochentage
-        sortWochentage()
-    }
-    
-    func sortWochentage() {
-        self.wochentage.sort {
-            guard let index1 = wochentagReihenfolge.firstIndex(of: $0.name),
-                  let index2 = wochentagReihenfolge.firstIndex(of: $1.name) else {
-                return false
-            }
-            return index1 < index2
-        }
-    }
-    
+
     func addGericht(to tag: Wochentag, gericht: Gericht) {
-        if let index = wochentage.firstIndex(where: { $0.id == tag.id }) {
-            wochentage[index].gerichte.append(gericht)
-            saveTag(tag: wochentage[index])
-        }
+        guard wochentage[tag] != nil else { return }
+        
+        wochentage[tag]?.append(gericht)
+        saveGericht(gericht: gericht)
     }
     
-    //Refactoring und verschieben über Tage hinweg
     func moveGericht(within tag: Wochentag, from indices: IndexSet, to newOffset: Int) {
-        guard let sourceIndex = indices.first,
-              let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }) else { return }
-        
-        let gericht = wochentage[tagIndex].gerichte.remove(at: sourceIndex)
+        guard let sourceIndex = indices.first else { return }
+        guard var gerichte = wochentage[tag], !gerichte.isEmpty else { return }
+        let gericht = gerichte.remove(at: sourceIndex)
         let targetIndex = newOffset > sourceIndex ? newOffset - 1 : newOffset
-        wochentage[tagIndex].gerichte.insert(gericht, at: targetIndex)
-        saveTag(tag: wochentage[tagIndex])
+        gerichte.insert(gericht, at: targetIndex)
+        
+        wochentage[tag] = gerichte
+        saveGericht(gericht: gericht)
     }
     
     func deleteGericht(at indices: IndexSet, from tag: Wochentag) {
-        if let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }) {
-            for index in indices {
-                let gericht = wochentage[tagIndex].gerichte[index]
-                modelContext?.delete(gericht)
-            }
-            wochentage[tagIndex].gerichte.remove(atOffsets: indices)
-            saveTag(tag: wochentage[tagIndex])
+        guard let gerichte = wochentage[tag] else { return }
+        
+        for index in indices {
+            let gericht = gerichte[index]
+            modelContext?.delete(gericht)
         }
+        
+        wochentage[tag]?.remove(atOffsets: indices)
     }
     
     func toggleZutatErledigt(zutat: Zutat) {
-        for tag in wochentage {
-            if let gericht = tag.gerichte.first(where: { $0.zutaten.contains(where: { $0.id == zutat.id }) }),
-               let zutatIndex = gericht.zutaten.firstIndex(where: { $0.id == zutat.id }) {
-                gericht.zutaten[zutatIndex].erledigt.toggle()
-                saveTag(tag: tag)
+        for (tag, gerichte) in wochentage {
+            if let gerichtIndex = gerichte.firstIndex(where: { $0.zutaten.contains(where: { $0.id == zutat.id }) }),
+               let zutatIndex = gerichte[gerichtIndex].zutaten.firstIndex(where: { $0.id == zutat.id }) {
+                
+                wochentage[tag]?[gerichtIndex].zutaten[zutatIndex].erledigt.toggle()
+                saveGericht(gericht: wochentage[tag]![gerichtIndex])
                 return
             }
         }
     }
     
     func markiereAllesErledigt() {
-        let alleZutaten = wochentage.flatMap { $0.gerichte.flatMap { $0.zutaten } }
-        alleZutaten.forEach { $0.erledigt = true }
+        for tag in Wochentag.allCases {
+            if let gerichte = wochentage[tag] {
+                for gerichtIndex in gerichte.indices {
+                    for zutatIndex in gerichte[gerichtIndex].zutaten.indices {
+                        wochentage[tag]?[gerichtIndex].zutaten[zutatIndex].erledigt = true
+                    }
+                    saveGericht(gericht: wochentage[tag]![gerichtIndex])
+                }
+            }
+        }
         try? modelContext?.save()
     }
-
-    
+  
     func deleteAllGerichte() {
         guard let modelContext = modelContext else {
             print("ModelContext ist nicht verfügbar.")
             return
         }
         
-        for wochentag in wochentage {
-            for gericht in wochentag.gerichte {
-                modelContext.delete(gericht)
+        for tag in Wochentag.allCases {
+            if let gerichte = wochentage[tag] {
+                for gericht in gerichte {
+                    modelContext.delete(gericht)
+                }
             }
-            wochentag.gerichte.removeAll()
+            wochentage[tag] = []
         }
         
         do {
@@ -150,19 +124,14 @@ class WochenplanViewModel: ObservableObject {
             print("Fehler beim Speichern nach dem Löschen der Gerichte: \(error)")
         }
     }
-
-    
+  
     func deleteZutat(from gericht: Gericht, in tag: Wochentag, zutat: Zutat) {
-        if let tagIndex = wochentage.firstIndex(where: { $0.id == tag.id }),
-           let gerichtIndex = wochentage[tagIndex].gerichte.firstIndex(where: { $0.id == gericht.id }) {
-            wochentage[tagIndex].gerichte[gerichtIndex].zutaten.removeAll { $0 == zutat }
-            saveTag(tag: wochentage[tagIndex])
-        }
-    }
-    
-    private func saveTag(tag: Wochentag) {
-        modelContext?.insert(tag)
-        try? modelContext?.save()
+        guard let gerichte = wochentage[tag],
+              let gerichtIndex = gerichte.firstIndex(where: { $0.id == gericht.id }),
+              let zutatIndex = gerichte[gerichtIndex].zutaten.firstIndex(where: { $0 == zutat }) else { return }
+        
+        wochentage[tag]?[gerichtIndex].zutaten.remove(at: zutatIndex)
+        saveGericht(gericht: wochentage[tag]![gerichtIndex])
     }
     
     private func saveGericht(gericht: Gericht) {

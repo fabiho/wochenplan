@@ -31,30 +31,37 @@ struct AddGerichtView: View {
                                     focusedField = 0
                                 }
                             }
-                        WochentagSelectorView(wochentage: viewModel.wochentage, selectedIndex: $selectedWochentagIndex)
+                        WochentagSelector(
+                            wochentage: Wochentag.allCases,
+                            selectedIndex: $selectedWochentagIndex
+                        )
                     }
                     .listRowBackground(Color.primary)
                     
                     Section(header: Text("Zutaten")) {
-                        ZutatenListView(zutaten: $zutaten, focusedField: $focusedField, viewModel: viewModel)
+                        ZutatenListView(
+                            zutaten: $zutaten,
+                            focusedField: $focusedField,
+                            viewModel: viewModel
+                        )
                     }
                     .listRowBackground(Color.primary)
                     
                     HStack {
-                        CancelButtonView {
+                        CancelButton {
                             presentationMode.wrappedValue.dismiss()
                         }
                         
                         Spacer()
                         
-                        SaveButtonView(
+                        SaveButton(
                             action: {
                                 let neueZutaten = zutaten
                                     .filter { !$0.name.isEmpty }
                                     .map {zutat in
                                         Zutat(name: zutat.name, erledigt: false, kategorie: zutat.kategorie)}
-                                let neuesGericht = Gericht(name: gerichtName, zutaten: neueZutaten)
-                                let selectedTag = viewModel.wochentage[selectedWochentagIndex]
+                                let neuesGericht = Gericht(name: gerichtName, zutaten: neueZutaten, wochentag: Wochentag.dienstag)
+                                let selectedTag = Wochentag.allCases[selectedWochentagIndex]
                                 viewModel.addGericht(to: selectedTag, gericht: neuesGericht)
                                 presentationMode.wrappedValue.dismiss()
                             },

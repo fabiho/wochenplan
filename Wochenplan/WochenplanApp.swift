@@ -12,7 +12,7 @@ import SwiftData
 struct WochenplanApp: App {
     var modelContainer: ModelContainer = {
         do {
-            return try ModelContainer(for: Gericht.self, Wochentag.self)
+            return try ModelContainer(for: Gericht.self)
         } catch {
             fatalError("Fehler beim Initialisieren des ModelContainers: \(error)")
         }

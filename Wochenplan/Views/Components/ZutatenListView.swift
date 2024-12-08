@@ -11,7 +11,6 @@ import SwiftUI
 struct ZutatenListView: View {
     @Binding var zutaten: [Zutat]
     var focusedField: FocusState<Int?>.Binding
-//    var kategorien: [Kategorie]
     @ObservedObject var viewModel: WochenplanViewModel
     
     var body: some View {

@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-public struct ActionButtonView: View {
+public struct ActionButton: View {
     @EnvironmentObject var viewModel: WochenplanViewModel
     
     let action:()->Void
