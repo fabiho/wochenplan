@@ -16,6 +16,7 @@ enum Kategorie: String, Codable, CaseIterable {
     case Brot = "Brot & Backwaren"
     case Getränke = "Getränke"
     case Nudeln = "Nudeln & Reis"
+    case ohneKategorie = "Ohne Kategorie"
     
     var image: Image {
         switch self {
@@ -31,6 +32,8 @@ enum Kategorie: String, Codable, CaseIterable {
             return Image("milk")
         case .Nudeln:
             return Image("noodle")
+        case .ohneKategorie:
+            return Image(systemName: "questionmark")
         }
     }
 }
