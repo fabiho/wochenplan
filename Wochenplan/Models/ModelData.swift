@@ -25,7 +25,7 @@ class Zutat {
 
 @Model
 class Gericht {
-    @Attribute(.unique) var id: UUID
+    @Attribute(.unique) var id: UUID 
     var name: String
     var zutaten: [Zutat]
     var wochentag: Wochentag?
@@ -37,17 +37,4 @@ class Gericht {
         self.wochentag = wochentag
     }
 }
-
-//@Model
-//class Wochentag {
-//    @Attribute(.unique) var id: UUID
-//    var name: String
-//    var gerichte: [Gericht]
-//
-//    init(name: String, gerichte: [Gericht] = []) {
-//        self.id = UUID()
-//        self.name = name
-//        self.gerichte = gerichte
-//    }
-//}
 

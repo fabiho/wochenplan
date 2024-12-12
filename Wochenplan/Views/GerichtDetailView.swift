@@ -9,59 +9,91 @@ import SwiftUI
 import SwiftData
 
 struct GerichtDetailView: View {
-    @EnvironmentObject var viewModel: WochenplanViewModel
-    var gericht: Gericht
-    var wochentag: Wochentag
-    
+    @Environment(\.presentationMode) var presentationMode
+    @ObservedObject var viewModel: WochenplanViewModel
+    @State private var selectedWochentagIndex: Int
+    @State private var gerichtName: String
+    @State private var zutaten: [Zutat]
+    @FocusState private var focusedField: Int?
+    let gericht: Gericht
+
+    init(viewModel: WochenplanViewModel, gericht: Gericht) {
+        self.viewModel = viewModel
+        self.gericht = gericht
+        _selectedWochentagIndex = State(initialValue: Wochentag.allCases.firstIndex(of: gericht.wochentag ?? .montag) ?? 0)
+        _gerichtName = State(initialValue: gericht.name)
+        _zutaten = State(initialValue: gericht.zutaten)
+    }
+
     var body: some View {
-        ZStack {
-            VStack(alignment: .leading, spacing: 10) {
-                Text(gericht.name)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                
-                HStack{
-                    Image(systemName: "calendar")
-                    Text("\(wochentag)")
-                        .font(.title3)
-                }
-                .foregroundStyle(Color.gray)
-                
-                List {
-                    Section(header: Text("Zutaten")
-                        .font(.headline)
-                    ) {
-                        ForEach(gericht.zutaten, id: \.self) { zutat in
-                            HStack {
-                                Text(zutat.name)
-                                Spacer()
-                                
-                                if let kategorie = zutat.kategorie {
-                                    kategorie.image
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(height: 30)
+        NavigationView {
+            ZStack {
+                Form {
+                    Section(header: Text("Gericht")) {
+                        TextField("Gerichtname", text: $gerichtName)
+                            .foregroundColor(.white)
+                            .focused($focusedField, equals: -1)
+                            .onSubmit {
+                                if !gerichtName.isEmpty {
+                                    focusedField = 0
                                 }
                             }
-                            .listRowBackground(Color.primary)
-                            .foregroundColor(Color.white)
+                        WochentagSelector(
+                            wochentage: Wochentag.allCases,
+                            selectedIndex: $selectedWochentagIndex
+                        )
+                    }
+                    .listRowBackground(Color.primary)
+                    
+                    Section(header: Text("Zutaten")) {
+                        ZutatenListView(
+                            zutaten: $zutaten,
+                            focusedField: $focusedField,
+                            viewModel: viewModel
+                        )
+                    }
+                    .listRowBackground(Color.primary)
+                    
+                    HStack {
+                        CancelButton {
+                            presentationMode.wrappedValue.dismiss()
                         }
-                        .onDelete { indexSet in
-                            if let index = indexSet.first {
-                                let zutatToDelete = gericht.zutaten[index]
-                                viewModel.deleteZutat(from: gericht, in: wochentag, zutat: zutatToDelete)
-                            }
-                        }
+                        
+                        Spacer()
+                        
+                        SaveButton(
+                            action: {
+                                let neueZutaten = zutaten
+                                    .filter { !$0.name.isEmpty }
+                                    .map { zutat in
+                                        Zutat(name: zutat.name, erledigt: zutat.erledigt, kategorie: zutat.kategorie)
+                                    }
+                                let updatedWochentag = Wochentag.allCases[selectedWochentagIndex]
+                                
+                                viewModel.updateGericht(
+                                    gericht: gericht,
+                                    name: gerichtName,
+                                    wochentag: updatedWochentag,
+                                    zutaten: neueZutaten
+                                )
+                                presentationMode.wrappedValue.dismiss()
+                            },
+                            isDisabled: gerichtName.isEmpty
+                        )
                     }
                 }
                 .scrollContentBackground(.hidden)
             }
-            .padding()
-            .navigationTitle("Gerichtdetails")
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Gericht bearbeiten")
         }
     }
-    
 }
+
+
+
+
+
+
+
 
 

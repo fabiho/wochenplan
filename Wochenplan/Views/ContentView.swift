@@ -8,9 +8,6 @@
 import SwiftUI
 import SwiftData
 
-import SwiftUI
-import SwiftData
-
 struct ContentView: View {
     @EnvironmentObject var viewModel: WochenplanViewModel
     @State private var isShowingAddGericht = false
@@ -31,8 +28,8 @@ struct ContentView: View {
                                     ForEach(gerichte) { gericht in
                                         NavigationLink(
                                             destination: GerichtDetailView(
-                                                gericht: gericht,
-                                                wochentag: tag
+                                                viewModel: viewModel,
+                                                gericht: gericht
                                             )
                                         ) {
                                             Image(systemName: "fork.knife")

@@ -14,8 +14,6 @@ struct AddGerichtView: View {
     @State private var selectedWochentagIndex: Int = 0
     @State private var gerichtName: String = ""
     @State private var zutaten: [Zutat] = [Zutat(name: "", erledigt: false, kategorie: nil )]
-    
-    // Fokussiert den Fokus auf jedes Textfeld
     @FocusState private var focusedField: Int?
     
     var body: some View {
