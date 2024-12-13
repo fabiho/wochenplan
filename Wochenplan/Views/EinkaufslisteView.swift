@@ -63,6 +63,7 @@ struct EinkaufslisteView: View {
                         .listStyle(InsetGroupedListStyle())
                     }
                     .navigationTitle("Einkaufsliste")
+                    .scrollContentBackground(.hidden)
                 }
             }
         }

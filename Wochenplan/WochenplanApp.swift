@@ -20,7 +20,7 @@ struct WochenplanApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            WochenplanView()
                 .environmentObject(WochenplanViewModel(context: modelContainer.mainContext))
                 .modelContainer(modelContainer)
         }

@@ -8,13 +8,13 @@
 import SwiftUI
 import SwiftData
 
-struct ContentView: View {
+struct WochenplanView: View {
     @EnvironmentObject var viewModel: WochenplanViewModel
     @State private var isShowingAddGericht = false
     @State private var selectedGericht: Gericht?
     @State private var selectedWochentag: Wochentag?
     @State private var showEinkaufsliste = false
-
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -58,7 +58,7 @@ struct ContentView: View {
                     .navigationTitle("Dein Wochenplan")
                     .scrollContentBackground(.hidden)
                 }
-
+                
                 VStack {
                     Spacer()
                     HStack {
@@ -91,12 +91,12 @@ struct ContentView: View {
 }
 
 #Preview("Mit Inhalt") {
-    ContentView()
+    WochenplanView()
         .environmentObject(PreviewContent.previewViewModelWithContent)
 }
 
 #Preview("Ohne Inhalt") {
-    ContentView()
+    WochenplanView()
         .environmentObject(PreviewContent.previewViewModelEmpty)
 }
 
